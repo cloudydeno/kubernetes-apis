@@ -8,8 +8,9 @@ export async function writeApiModule(surface: SurfaceMap, api: SurfaceApi, categ
 
   function postProcess(text: string) {
     if (apisModuleRoot) {
+      const isJsrRoot = apisModuleRoot.startsWith('jsr:') || apisModuleRoot.startsWith('@');
       text = text.replaceAll(/from "..\/..\/([^"]+)"/g, (_, path) => {
-        if (apisModuleRoot.startsWith('jsr:') && path.includes('@')) {
+        if (isJsrRoot && path.includes('@')) {
           return `from "${apisModuleRoot}${path.split('/')[1].replace('@', '/')}"`;
         } else {
           return `from "${apisModuleRoot}${path}"`;
