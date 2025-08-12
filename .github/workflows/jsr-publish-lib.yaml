@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: denoland/setup-deno@v2
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Publish to JSR
       working-directory: lib
