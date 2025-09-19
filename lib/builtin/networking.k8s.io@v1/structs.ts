@@ -93,6 +93,76 @@ export function fromHTTPIngressRuleValue(input: HTTPIngressRuleValue): c.JSONVal
     paths: input.paths?.map(fromHTTPIngressPath),
   }}
 
+/** IPAddress represents a single IP of a single IP Family. The object is designed to be used by APIs that operate on IP addresses. The object is used by the Service core API for allocation of IP addresses. An IP address can be represented in different formats, to guarantee the uniqueness of the IP, the name of the object is the IP address in canonical format, four decimal digits separated by dots suppressing leading zeros for IPv4 and the representation defined by RFC 5952 for IPv6. Valid: 192.168.1.5 or 2001:db8::1 or 2001:db8:aaaa:bbbb:cccc:dddd:eeee:1 Invalid: 10.01.2.3 or 2001:db8:0:0:0::1 */
+export interface IPAddress {
+  apiVersion?: "networking.k8s.io/v1";
+  kind?: "IPAddress";
+  metadata?: MetaV1.ObjectMeta | null;
+  spec?: IPAddressSpec | null;
+}
+export function toIPAddress(input: c.JSONValue): IPAddress & c.ApiKind {
+  const obj = c.checkObj(input);
+  return {
+    ...c.assertOrAddApiVersionAndKind(obj, "networking.k8s.io/v1", "IPAddress"),
+    metadata: c.readOpt(obj["metadata"], MetaV1.toObjectMeta),
+    spec: c.readOpt(obj["spec"], toIPAddressSpec),
+  }}
+export function fromIPAddress(input: IPAddress): c.JSONValue {
+  return {
+    ...c.assertOrAddApiVersionAndKind(input, "networking.k8s.io/v1", "IPAddress"),
+    ...input,
+    metadata: input.metadata != null ? MetaV1.fromObjectMeta(input.metadata) : undefined,
+    spec: input.spec != null ? fromIPAddressSpec(input.spec) : undefined,
+  }}
+
+/** IPAddressSpec describe the attributes in an IP Address. */
+export interface IPAddressSpec {
+  parentRef: ParentReference;
+}
+export function toIPAddressSpec(input: c.JSONValue): IPAddressSpec {
+  const obj = c.checkObj(input);
+  return {
+    parentRef: toParentReference(obj["parentRef"]),
+  }}
+export function fromIPAddressSpec(input: IPAddressSpec): c.JSONValue {
+  return {
+    ...input,
+    parentRef: input.parentRef != null ? fromParentReference(input.parentRef) : undefined,
+  }}
+
+/** ParentReference describes a reference to a parent object. */
+export interface ParentReference {
+  group?: string | null;
+  name: string;
+  namespace?: string | null;
+  resource: string;
+}
+export function toParentReference(input: c.JSONValue): ParentReference {
+  const obj = c.checkObj(input);
+  return {
+    group: c.readOpt(obj["group"], c.checkStr),
+    name: c.checkStr(obj["name"]),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    resource: c.checkStr(obj["resource"]),
+  }}
+export function fromParentReference(input: ParentReference): c.JSONValue {
+  return {
+    ...input,
+  }}
+
+/** IPAddressList contains a list of IPAddress. */
+export interface IPAddressList extends ListOf<IPAddress> {
+  apiVersion?: "networking.k8s.io/v1";
+  kind?: "IPAddressList";
+};
+export function toIPAddressList(input: c.JSONValue): IPAddressList & c.ApiKind {
+  const obj = c.checkObj(input);
+  return {
+    ...c.assertOrAddApiVersionAndKind(obj, "networking.k8s.io/v1", "IPAddressList"),
+    metadata: MetaV1.toListMeta(obj.metadata),
+    items: c.readList(obj.items, toIPAddress),
+  }}
+
 /** IPBlock describes a particular CIDR (Ex. "192.168.1.0/24","2001:db8::/64") that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The except entry describes CIDRs that should not be included within this rule. */
 export interface IPBlock {
   cidr: string;
@@ -370,7 +440,7 @@ export function fromNetworkPolicy(input: NetworkPolicy): c.JSONValue {
 export interface NetworkPolicySpec {
   egress?: Array<NetworkPolicyEgressRule> | null;
   ingress?: Array<NetworkPolicyIngressRule> | null;
-  podSelector: MetaV1.LabelSelector;
+  podSelector?: MetaV1.LabelSelector | null;
   policyTypes?: Array<string> | null;
 }
 export function toNetworkPolicySpec(input: c.JSONValue): NetworkPolicySpec {
@@ -378,7 +448,7 @@ export function toNetworkPolicySpec(input: c.JSONValue): NetworkPolicySpec {
   return {
     egress: c.readOpt(obj["egress"], x => c.readList(x, toNetworkPolicyEgressRule)),
     ingress: c.readOpt(obj["ingress"], x => c.readList(x, toNetworkPolicyIngressRule)),
-    podSelector: MetaV1.toLabelSelector(obj["podSelector"]),
+    podSelector: c.readOpt(obj["podSelector"], MetaV1.toLabelSelector),
     policyTypes: c.readOpt(obj["policyTypes"], x => c.readList(x, c.checkStr)),
   }}
 export function fromNetworkPolicySpec(input: NetworkPolicySpec): c.JSONValue {
@@ -475,4 +545,71 @@ export function toNetworkPolicyList(input: c.JSONValue): NetworkPolicyList & c.A
     ...c.assertOrAddApiVersionAndKind(obj, "networking.k8s.io/v1", "NetworkPolicyList"),
     metadata: MetaV1.toListMeta(obj.metadata),
     items: c.readList(obj.items, toNetworkPolicy),
+  }}
+
+/** ServiceCIDR defines a range of IP addresses using CIDR format (e.g. 192.168.0.0/24 or 2001:db2::/64). This range is used to allocate ClusterIPs to Service objects. */
+export interface ServiceCIDR {
+  apiVersion?: "networking.k8s.io/v1";
+  kind?: "ServiceCIDR";
+  metadata?: MetaV1.ObjectMeta | null;
+  spec?: ServiceCIDRSpec | null;
+  status?: ServiceCIDRStatus | null;
+}
+export function toServiceCIDR(input: c.JSONValue): ServiceCIDR & c.ApiKind {
+  const obj = c.checkObj(input);
+  return {
+    ...c.assertOrAddApiVersionAndKind(obj, "networking.k8s.io/v1", "ServiceCIDR"),
+    metadata: c.readOpt(obj["metadata"], MetaV1.toObjectMeta),
+    spec: c.readOpt(obj["spec"], toServiceCIDRSpec),
+    status: c.readOpt(obj["status"], toServiceCIDRStatus),
+  }}
+export function fromServiceCIDR(input: ServiceCIDR): c.JSONValue {
+  return {
+    ...c.assertOrAddApiVersionAndKind(input, "networking.k8s.io/v1", "ServiceCIDR"),
+    ...input,
+    metadata: input.metadata != null ? MetaV1.fromObjectMeta(input.metadata) : undefined,
+    spec: input.spec != null ? fromServiceCIDRSpec(input.spec) : undefined,
+    status: input.status != null ? fromServiceCIDRStatus(input.status) : undefined,
+  }}
+
+/** ServiceCIDRSpec define the CIDRs the user wants to use for allocating ClusterIPs for Services. */
+export interface ServiceCIDRSpec {
+  cidrs?: Array<string> | null;
+}
+export function toServiceCIDRSpec(input: c.JSONValue): ServiceCIDRSpec {
+  const obj = c.checkObj(input);
+  return {
+    cidrs: c.readOpt(obj["cidrs"], x => c.readList(x, c.checkStr)),
+  }}
+export function fromServiceCIDRSpec(input: ServiceCIDRSpec): c.JSONValue {
+  return {
+    ...input,
+  }}
+
+/** ServiceCIDRStatus describes the current state of the ServiceCIDR. */
+export interface ServiceCIDRStatus {
+  conditions?: Array<MetaV1.Condition> | null;
+}
+export function toServiceCIDRStatus(input: c.JSONValue): ServiceCIDRStatus {
+  const obj = c.checkObj(input);
+  return {
+    conditions: c.readOpt(obj["conditions"], x => c.readList(x, MetaV1.toCondition)),
+  }}
+export function fromServiceCIDRStatus(input: ServiceCIDRStatus): c.JSONValue {
+  return {
+    ...input,
+    conditions: input.conditions?.map(MetaV1.fromCondition),
+  }}
+
+/** ServiceCIDRList contains a list of ServiceCIDR objects. */
+export interface ServiceCIDRList extends ListOf<ServiceCIDR> {
+  apiVersion?: "networking.k8s.io/v1";
+  kind?: "ServiceCIDRList";
+};
+export function toServiceCIDRList(input: c.JSONValue): ServiceCIDRList & c.ApiKind {
+  const obj = c.checkObj(input);
+  return {
+    ...c.assertOrAddApiVersionAndKind(obj, "networking.k8s.io/v1", "ServiceCIDRList"),
+    metadata: MetaV1.toListMeta(obj.metadata),
+    items: c.readList(obj.items, toServiceCIDR),
   }}

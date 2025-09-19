@@ -46,6 +46,8 @@ export interface ApplicationSource {
     passCredentials?: boolean | null;
     releaseName?: string | null;
     skipCrds?: boolean | null;
+    skipSchemaValidation?: boolean | null;
+    skipTests?: boolean | null;
     valueFiles?: Array<string> | null;
     values?: string | null;
     valuesObject?: c.JSONValue | null;
@@ -59,8 +61,10 @@ export interface ApplicationSource {
     components?: Array<string> | null;
     forceCommonAnnotations?: boolean | null;
     forceCommonLabels?: boolean | null;
+    ignoreMissingComponents?: boolean | null;
     images?: Array<string> | null;
     kubeVersion?: string | null;
+    labelIncludeTemplates?: boolean | null;
     labelWithoutSelector?: boolean | null;
     namePrefix?: string | null;
     nameSuffix?: string | null;
@@ -85,6 +89,7 @@ export interface ApplicationSource {
     }> | null;
     version?: string | null;
   } | null;
+  name?: string | null;
   path?: string | null;
   plugin?: {
     env?: Array<{
@@ -110,6 +115,7 @@ export function toApplicationSource(input: c.JSONValue): ApplicationSource {
     directory: c.readOpt(obj["directory"], toApplicationSource_directory),
     helm: c.readOpt(obj["helm"], toApplicationSource_helm),
     kustomize: c.readOpt(obj["kustomize"], toApplicationSource_kustomize),
+    name: c.readOpt(obj["name"], c.checkStr),
     path: c.readOpt(obj["path"], c.checkStr),
     plugin: c.readOpt(obj["plugin"], toApplicationSource_plugin),
     ref: c.readOpt(obj["ref"], c.checkStr),
@@ -140,6 +146,8 @@ function toApplicationSource_helm(input: c.JSONValue) {
     passCredentials: c.readOpt(obj["passCredentials"], c.checkBool),
     releaseName: c.readOpt(obj["releaseName"], c.checkStr),
     skipCrds: c.readOpt(obj["skipCrds"], c.checkBool),
+    skipSchemaValidation: c.readOpt(obj["skipSchemaValidation"], c.checkBool),
+    skipTests: c.readOpt(obj["skipTests"], c.checkBool),
     valueFiles: c.readOpt(obj["valueFiles"], x => c.readList(x, c.checkStr)),
     values: c.readOpt(obj["values"], c.checkStr),
     valuesObject: c.readOpt(obj["valuesObject"], c.identity),
@@ -155,8 +163,10 @@ function toApplicationSource_kustomize(input: c.JSONValue) {
     components: c.readOpt(obj["components"], x => c.readList(x, c.checkStr)),
     forceCommonAnnotations: c.readOpt(obj["forceCommonAnnotations"], c.checkBool),
     forceCommonLabels: c.readOpt(obj["forceCommonLabels"], c.checkBool),
+    ignoreMissingComponents: c.readOpt(obj["ignoreMissingComponents"], c.checkBool),
     images: c.readOpt(obj["images"], x => c.readList(x, c.checkStr)),
     kubeVersion: c.readOpt(obj["kubeVersion"], c.checkStr),
+    labelIncludeTemplates: c.readOpt(obj["labelIncludeTemplates"], c.checkBool),
     labelWithoutSelector: c.readOpt(obj["labelWithoutSelector"], c.checkBool),
     namePrefix: c.readOpt(obj["namePrefix"], c.checkStr),
     nameSuffix: c.readOpt(obj["nameSuffix"], c.checkStr),
@@ -316,10 +326,25 @@ export interface Application {
     project: string;
     revisionHistoryLimit?: number | null;
     source?: ApplicationSource | null;
+    sourceHydrator?: {
+      drySource: {
+        path: string;
+        repoURL: string;
+        targetRevision: string;
+      };
+      hydrateTo?: {
+        targetBranch: string;
+      } | null;
+      syncSource: {
+        path: string;
+        targetBranch: string;
+      };
+    } | null;
     sources?: Array<ApplicationSource> | null;
     syncPolicy?: {
       automated?: {
         allowEmpty?: boolean | null;
+        enabled?: boolean | null;
         prune?: boolean | null;
         selfHeal?: boolean | null;
       } | null;
@@ -346,6 +371,7 @@ export interface Application {
     }> | null;
     controllerNamespace?: string | null;
     health?: {
+      lastTransitionTime?: c.Time | null;
       message?: string | null;
       status?: string | null;
     } | null;
@@ -421,6 +447,7 @@ export interface Application {
           group: string;
           hookPhase?: string | null;
           hookType?: string | null;
+          images?: Array<string> | null;
           kind: string;
           message?: string | null;
           name: string;
@@ -440,6 +467,7 @@ export interface Application {
     resources?: Array<{
       group?: string | null;
       health?: {
+        lastTransitionTime?: c.Time | null;
         message?: string | null;
         status?: string | null;
       } | null;
@@ -447,11 +475,54 @@ export interface Application {
       kind?: string | null;
       name?: string | null;
       namespace?: string | null;
+      requiresDeletionConfirmation?: boolean | null;
       requiresPruning?: boolean | null;
       status?: string | null;
       syncWave?: number | null;
       version?: string | null;
     }> | null;
+    sourceHydrator?: {
+      currentOperation?: {
+        drySHA?: string | null;
+        finishedAt?: c.Time | null;
+        hydratedSHA?: string | null;
+        message: string;
+        phase: "Hydrating" | "Failed" | "Hydrated" | c.UnexpectedEnumValue;
+        sourceHydrator?: {
+          drySource: {
+            path: string;
+            repoURL: string;
+            targetRevision: string;
+          };
+          hydrateTo?: {
+            targetBranch: string;
+          } | null;
+          syncSource: {
+            path: string;
+            targetBranch: string;
+          };
+        } | null;
+        startedAt?: c.Time | null;
+      } | null;
+      lastSuccessfulOperation?: {
+        drySHA?: string | null;
+        hydratedSHA?: string | null;
+        sourceHydrator?: {
+          drySource: {
+            path: string;
+            repoURL: string;
+            targetRevision: string;
+          };
+          hydrateTo?: {
+            targetBranch: string;
+          } | null;
+          syncSource: {
+            path: string;
+            targetBranch: string;
+          };
+        } | null;
+      } | null;
+    } | null;
     sourceType?: string | null;
     sourceTypes?: Array<string> | null;
     summary?: {
@@ -516,6 +587,10 @@ export function fromApplication(input: Application): c.JSONValue {
         ...x,
         lastTransitionTime: x.lastTransitionTime != null ? c.fromTime(x.lastTransitionTime) : undefined,
       })),
+      health: input.status.health != null ? {
+        ...input.status.health,
+        lastTransitionTime: input.status.health.lastTransitionTime != null ? c.fromTime(input.status.health.lastTransitionTime) : undefined,
+      } : undefined,
       history: input.status.history?.map(x => ({
         ...x,
         deployStartedAt: x.deployStartedAt != null ? c.fromTime(x.deployStartedAt) : undefined,
@@ -543,6 +618,21 @@ export function fromApplication(input: Application): c.JSONValue {
         } : undefined,
       } : undefined,
       reconciledAt: input.status.reconciledAt != null ? c.fromTime(input.status.reconciledAt) : undefined,
+      resources: input.status.resources?.map(x => ({
+        ...x,
+        health: x.health != null ? {
+          ...x.health,
+          lastTransitionTime: x.health.lastTransitionTime != null ? c.fromTime(x.health.lastTransitionTime) : undefined,
+        } : undefined,
+      })),
+      sourceHydrator: input.status.sourceHydrator != null ? {
+        ...input.status.sourceHydrator,
+        currentOperation: input.status.sourceHydrator.currentOperation != null ? {
+          ...input.status.sourceHydrator.currentOperation,
+          finishedAt: input.status.sourceHydrator.currentOperation.finishedAt != null ? c.fromTime(input.status.sourceHydrator.currentOperation.finishedAt) : undefined,
+          startedAt: input.status.sourceHydrator.currentOperation.startedAt != null ? c.fromTime(input.status.sourceHydrator.currentOperation.startedAt) : undefined,
+        } : undefined,
+      } : undefined,
       sync: input.status.sync != null ? {
         ...input.status.sync,
         comparedTo: input.status.sync.comparedTo != null ? {
@@ -570,6 +660,7 @@ function toApplication_spec(input: c.JSONValue) {
     project: c.checkStr(obj["project"]),
     revisionHistoryLimit: c.readOpt(obj["revisionHistoryLimit"], c.checkNum),
     source: c.readOpt(obj["source"], toApplicationSource),
+    sourceHydrator: c.readOpt(obj["sourceHydrator"], toApplication_spec_sourceHydrator),
     sources: c.readOpt(obj["sources"], x => c.readList(x, toApplicationSource)),
     syncPolicy: c.readOpt(obj["syncPolicy"], toApplication_spec_syncPolicy),
   }}
@@ -585,6 +676,7 @@ function toApplication_status(input: c.JSONValue) {
     reconciledAt: c.readOpt(obj["reconciledAt"], c.toTime),
     resourceHealthSource: c.readOpt(obj["resourceHealthSource"], c.checkStr),
     resources: c.readOpt(obj["resources"], x => c.readList(x, toApplication_status_resources)),
+    sourceHydrator: c.readOpt(obj["sourceHydrator"], toApplication_status_sourceHydrator),
     sourceType: c.readOpt(obj["sourceType"], c.checkStr),
     sourceTypes: c.readOpt(obj["sourceTypes"], x => c.readList(x, c.checkStr)),
     summary: c.readOpt(obj["summary"], toApplication_status_summary),
@@ -647,6 +739,13 @@ function toApplication_spec_info(input: c.JSONValue) {
     name: c.checkStr(obj["name"]),
     value: c.checkStr(obj["value"]),
   }}
+function toApplication_spec_sourceHydrator(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    drySource: toApplication_spec_sourceHydrator_drySource(obj["drySource"]),
+    hydrateTo: c.readOpt(obj["hydrateTo"], toApplication_spec_sourceHydrator_hydrateTo),
+    syncSource: toApplication_spec_sourceHydrator_syncSource(obj["syncSource"]),
+  }}
 function toApplication_spec_syncPolicy(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
@@ -665,6 +764,7 @@ function toApplication_status_conditions(input: c.JSONValue) {
 function toApplication_status_health(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    lastTransitionTime: c.readOpt(obj["lastTransitionTime"], c.toTime),
     message: c.readOpt(obj["message"], c.checkStr),
     status: c.readOpt(obj["status"], c.checkStr),
   }}
@@ -700,10 +800,17 @@ function toApplication_status_resources(input: c.JSONValue) {
     kind: c.readOpt(obj["kind"], c.checkStr),
     name: c.readOpt(obj["name"], c.checkStr),
     namespace: c.readOpt(obj["namespace"], c.checkStr),
+    requiresDeletionConfirmation: c.readOpt(obj["requiresDeletionConfirmation"], c.checkBool),
     requiresPruning: c.readOpt(obj["requiresPruning"], c.checkBool),
     status: c.readOpt(obj["status"], c.checkStr),
     syncWave: c.readOpt(obj["syncWave"], c.checkNum),
     version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    currentOperation: c.readOpt(obj["currentOperation"], toApplication_status_sourceHydrator_currentOperation),
+    lastSuccessfulOperation: c.readOpt(obj["lastSuccessfulOperation"], toApplication_status_sourceHydrator_lastSuccessfulOperation),
   }}
 function toApplication_status_summary(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -740,10 +847,29 @@ function toApplication_operation_sync_syncStrategy(input: c.JSONValue) {
     apply: c.readOpt(obj["apply"], toApplication_operation_sync_syncStrategy_apply),
     hook: c.readOpt(obj["hook"], toApplication_operation_sync_syncStrategy_hook),
   }}
+function toApplication_spec_sourceHydrator_drySource(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    path: c.checkStr(obj["path"]),
+    repoURL: c.checkStr(obj["repoURL"]),
+    targetRevision: c.checkStr(obj["targetRevision"]),
+  }}
+function toApplication_spec_sourceHydrator_hydrateTo(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    targetBranch: c.checkStr(obj["targetBranch"]),
+  }}
+function toApplication_spec_sourceHydrator_syncSource(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    path: c.checkStr(obj["path"]),
+    targetBranch: c.checkStr(obj["targetBranch"]),
+  }}
 function toApplication_spec_syncPolicy_automated(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
     allowEmpty: c.readOpt(obj["allowEmpty"], c.checkBool),
+    enabled: c.readOpt(obj["enabled"], c.checkBool),
     prune: c.readOpt(obj["prune"], c.checkBool),
     selfHeal: c.readOpt(obj["selfHeal"], c.checkBool),
   }}
@@ -786,8 +912,27 @@ function toApplication_status_operationState_syncResult(input: c.JSONValue) {
 function toApplication_status_resources_health(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    lastTransitionTime: c.readOpt(obj["lastTransitionTime"], c.toTime),
     message: c.readOpt(obj["message"], c.checkStr),
     status: c.readOpt(obj["status"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_currentOperation(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    drySHA: c.readOpt(obj["drySHA"], c.checkStr),
+    finishedAt: c.readOpt(obj["finishedAt"], c.toTime),
+    hydratedSHA: c.readOpt(obj["hydratedSHA"], c.checkStr),
+    message: c.checkStr(obj["message"]),
+    phase: (x => c.readEnum<"Hydrating" | "Failed" | "Hydrated" | c.UnexpectedEnumValue>(x))(obj["phase"]),
+    sourceHydrator: c.readOpt(obj["sourceHydrator"], toApplication_status_sourceHydrator_currentOperation_sourceHydrator),
+    startedAt: c.readOpt(obj["startedAt"], c.toTime),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    drySHA: c.readOpt(obj["drySHA"], c.checkStr),
+    hydratedSHA: c.readOpt(obj["hydratedSHA"], c.checkStr),
+    sourceHydrator: c.readOpt(obj["sourceHydrator"], toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator),
   }}
 function toApplication_status_sync_comparedTo(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -859,6 +1004,7 @@ function toApplication_status_operationState_syncResult_resources(input: c.JSONV
     group: c.checkStr(obj["group"]),
     hookPhase: c.readOpt(obj["hookPhase"], c.checkStr),
     hookType: c.readOpt(obj["hookType"], c.checkStr),
+    images: c.readOpt(obj["images"], x => c.readList(x, c.checkStr)),
     kind: c.checkStr(obj["kind"]),
     message: c.readOpt(obj["message"], c.checkStr),
     name: c.checkStr(obj["name"]),
@@ -866,6 +1012,20 @@ function toApplication_status_operationState_syncResult_resources(input: c.JSONV
     status: c.readOpt(obj["status"], c.checkStr),
     syncPhase: c.readOpt(obj["syncPhase"], c.checkStr),
     version: c.checkStr(obj["version"]),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    drySource: toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource(obj["drySource"]),
+    hydrateTo: c.readOpt(obj["hydrateTo"], toApplication_status_sourceHydrator_currentOperation_sourceHydrator_hydrateTo),
+    syncSource: toApplication_status_sourceHydrator_currentOperation_sourceHydrator_syncSource(obj["syncSource"]),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    drySource: toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource(obj["drySource"]),
+    hydrateTo: c.readOpt(obj["hydrateTo"], toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_hydrateTo),
+    syncSource: toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource(obj["syncSource"]),
   }}
 function toApplication_status_sync_comparedTo_destination(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -906,6 +1066,42 @@ function toApplication_status_operationState_operation_sync_syncStrategy(input: 
     apply: c.readOpt(obj["apply"], toApplication_status_operationState_operation_sync_syncStrategy_apply),
     hook: c.readOpt(obj["hook"], toApplication_status_operationState_operation_sync_syncStrategy_hook),
   }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    path: c.checkStr(obj["path"]),
+    repoURL: c.checkStr(obj["repoURL"]),
+    targetRevision: c.checkStr(obj["targetRevision"]),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_hydrateTo(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    targetBranch: c.checkStr(obj["targetBranch"]),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_syncSource(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    path: c.checkStr(obj["path"]),
+    targetBranch: c.checkStr(obj["targetBranch"]),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    path: c.checkStr(obj["path"]),
+    repoURL: c.checkStr(obj["repoURL"]),
+    targetRevision: c.checkStr(obj["targetRevision"]),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_hydrateTo(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    targetBranch: c.checkStr(obj["targetBranch"]),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    path: c.checkStr(obj["path"]),
+    targetBranch: c.checkStr(obj["targetBranch"]),
+  }}
 function toApplication_status_operationState_operation_sync_syncStrategy_apply(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
@@ -939,6 +1135,7 @@ export interface ApplicationSetGenerator {
     values?: Record<string,string> | null;
   } | null;
   clusters?: {
+    flatList?: boolean | null;
     selector?: MetaV1.LabelSelector | null;
     template?: ApplicationTemplate | null;
     values?: Record<string,string> | null;
@@ -949,6 +1146,7 @@ export interface ApplicationSetGenerator {
       path: string;
     }> | null;
     files?: Array<{
+      exclude?: boolean | null;
       path: string;
     }> | null;
     pathParamPrefix?: string | null;
@@ -1043,6 +1241,7 @@ export interface ApplicationSetGenerator {
     gitea?: {
       api: string;
       insecure?: boolean | null;
+      labels?: Array<string> | null;
       owner: string;
       repo: string;
       tokenRef?: {
@@ -1078,6 +1277,7 @@ export interface ApplicationSetGenerator {
     } | null;
     requeueAfterSeconds?: number | null;
     template?: ApplicationTemplate | null;
+    values?: Record<string,string> | null;
   } | null;
   scmProvider?: {
     awsCodeCommit?: {
@@ -1254,6 +1454,7 @@ function toApplicationSetGenerator_clusterDecisionResource(input: c.JSONValue) {
 function toApplicationSetGenerator_clusters(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    flatList: c.readOpt(obj["flatList"], c.checkBool),
     selector: c.readOpt(obj["selector"], MetaV1.toLabelSelector),
     template: c.readOpt(obj["template"], toApplicationTemplate),
     values: c.readOpt(obj["values"], x => c.readMap(x, c.checkStr)),
@@ -1311,6 +1512,7 @@ function toApplicationSetGenerator_pullRequest(input: c.JSONValue) {
     gitlab: c.readOpt(obj["gitlab"], toApplicationSetGenerator_pullRequest_gitlab),
     requeueAfterSeconds: c.readOpt(obj["requeueAfterSeconds"], c.checkNum),
     template: c.readOpt(obj["template"], toApplicationTemplate),
+    values: c.readOpt(obj["values"], x => c.readMap(x, c.checkStr)),
   }}
 function toApplicationSetGenerator_scmProvider(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -1337,6 +1539,7 @@ function toApplicationSetGenerator_git_directories(input: c.JSONValue) {
 function toApplicationSetGenerator_git_files(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    exclude: c.readOpt(obj["exclude"], c.checkBool),
     path: c.checkStr(obj["path"]),
   }}
 function toApplicationSetGenerator_plugin_configMapRef(input: c.JSONValue) {
@@ -1390,6 +1593,7 @@ function toApplicationSetGenerator_pullRequest_gitea(input: c.JSONValue) {
   return {
     api: c.checkStr(obj["api"]),
     insecure: c.readOpt(obj["insecure"], c.checkBool),
+    labels: c.readOpt(obj["labels"], x => c.readList(x, c.checkStr)),
     owner: c.checkStr(obj["owner"]),
     repo: c.checkStr(obj["repo"]),
     tokenRef: c.readOpt(obj["tokenRef"], toApplicationSetGenerator_pullRequest_gitea_tokenRef),
@@ -1675,10 +1879,25 @@ export interface ApplicationTemplate {
     project: string;
     revisionHistoryLimit?: number | null;
     source?: ApplicationSource | null;
+    sourceHydrator?: {
+      drySource: {
+        path: string;
+        repoURL: string;
+        targetRevision: string;
+      };
+      hydrateTo?: {
+        targetBranch: string;
+      } | null;
+      syncSource: {
+        path: string;
+        targetBranch: string;
+      };
+    } | null;
     sources?: Array<ApplicationSource> | null;
     syncPolicy?: {
       automated?: {
         allowEmpty?: boolean | null;
+        enabled?: boolean | null;
         prune?: boolean | null;
         selfHeal?: boolean | null;
       } | null;
@@ -1731,6 +1950,7 @@ function toApplicationTemplate_spec(input: c.JSONValue) {
     project: c.checkStr(obj["project"]),
     revisionHistoryLimit: c.readOpt(obj["revisionHistoryLimit"], c.checkNum),
     source: c.readOpt(obj["source"], toApplicationSource),
+    sourceHydrator: c.readOpt(obj["sourceHydrator"], toApplicationTemplate_spec_sourceHydrator),
     sources: c.readOpt(obj["sources"], x => c.readList(x, toApplicationSource)),
     syncPolicy: c.readOpt(obj["syncPolicy"], toApplicationTemplate_spec_syncPolicy),
   }}
@@ -1758,6 +1978,13 @@ function toApplicationTemplate_spec_info(input: c.JSONValue) {
     name: c.checkStr(obj["name"]),
     value: c.checkStr(obj["value"]),
   }}
+function toApplicationTemplate_spec_sourceHydrator(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    drySource: toApplicationTemplate_spec_sourceHydrator_drySource(obj["drySource"]),
+    hydrateTo: c.readOpt(obj["hydrateTo"], toApplicationTemplate_spec_sourceHydrator_hydrateTo),
+    syncSource: toApplicationTemplate_spec_sourceHydrator_syncSource(obj["syncSource"]),
+  }}
 function toApplicationTemplate_spec_syncPolicy(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
@@ -1766,10 +1993,29 @@ function toApplicationTemplate_spec_syncPolicy(input: c.JSONValue) {
     retry: c.readOpt(obj["retry"], toApplicationTemplate_spec_syncPolicy_retry),
     syncOptions: c.readOpt(obj["syncOptions"], x => c.readList(x, c.checkStr)),
   }}
+function toApplicationTemplate_spec_sourceHydrator_drySource(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    path: c.checkStr(obj["path"]),
+    repoURL: c.checkStr(obj["repoURL"]),
+    targetRevision: c.checkStr(obj["targetRevision"]),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_hydrateTo(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    targetBranch: c.checkStr(obj["targetBranch"]),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_syncSource(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    path: c.checkStr(obj["path"]),
+    targetBranch: c.checkStr(obj["targetBranch"]),
+  }}
 function toApplicationTemplate_spec_syncPolicy_automated(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
     allowEmpty: c.readOpt(obj["allowEmpty"], c.checkBool),
+    enabled: c.readOpt(obj["enabled"], c.checkBool),
     prune: c.readOpt(obj["prune"], c.checkBool),
     selfHeal: c.readOpt(obj["selfHeal"], c.checkBool),
   }}
@@ -1850,6 +2096,7 @@ export interface ApplicationSet {
     resources?: Array<{
       group?: string | null;
       health?: {
+        lastTransitionTime?: c.Time | null;
         message?: string | null;
         status?: string | null;
       } | null;
@@ -1857,6 +2104,7 @@ export interface ApplicationSet {
       kind?: string | null;
       name?: string | null;
       namespace?: string | null;
+      requiresDeletionConfirmation?: boolean | null;
       requiresPruning?: boolean | null;
       status?: string | null;
       syncWave?: number | null;
@@ -1891,6 +2139,13 @@ export function fromApplicationSet(input: ApplicationSet): c.JSONValue {
       conditions: input.status.conditions?.map(x => ({
         ...x,
         lastTransitionTime: x.lastTransitionTime != null ? c.fromTime(x.lastTransitionTime) : undefined,
+      })),
+      resources: input.status.resources?.map(x => ({
+        ...x,
+        health: x.health != null ? {
+          ...x.health,
+          lastTransitionTime: x.health.lastTransitionTime != null ? c.fromTime(x.health.lastTransitionTime) : undefined,
+        } : undefined,
       })),
     } : undefined,
   }}
@@ -1968,6 +2223,7 @@ function toApplicationSet_status_resources(input: c.JSONValue) {
     kind: c.readOpt(obj["kind"], c.checkStr),
     name: c.readOpt(obj["name"], c.checkStr),
     namespace: c.readOpt(obj["namespace"], c.checkStr),
+    requiresDeletionConfirmation: c.readOpt(obj["requiresDeletionConfirmation"], c.checkBool),
     requiresPruning: c.readOpt(obj["requiresPruning"], c.checkBool),
     status: c.readOpt(obj["status"], c.checkStr),
     syncWave: c.readOpt(obj["syncWave"], c.checkNum),
@@ -1981,6 +2237,7 @@ function toApplicationSet_spec_strategy_rollingSync(input: c.JSONValue) {
 function toApplicationSet_status_resources_health(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    lastTransitionTime: c.readOpt(obj["lastTransitionTime"], c.toTime),
     message: c.readOpt(obj["message"], c.checkStr),
     status: c.readOpt(obj["status"], c.checkStr),
   }}
@@ -2074,8 +2331,10 @@ export interface AppProject {
     sourceNamespaces?: Array<string> | null;
     sourceRepos?: Array<string> | null;
     syncWindows?: Array<{
+      andOperator?: boolean | null;
       applications?: Array<string> | null;
       clusters?: Array<string> | null;
+      description?: string | null;
       duration?: string | null;
       kind?: string | null;
       manualSync?: boolean | null;
@@ -2192,8 +2451,10 @@ function toAppProject_spec_signatureKeys(input: c.JSONValue) {
 function toAppProject_spec_syncWindows(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    andOperator: c.readOpt(obj["andOperator"], c.checkBool),
     applications: c.readOpt(obj["applications"], x => c.readList(x, c.checkStr)),
     clusters: c.readOpt(obj["clusters"], x => c.readList(x, c.checkStr)),
+    description: c.readOpt(obj["description"], c.checkStr),
     duration: c.readOpt(obj["duration"], c.checkStr),
     kind: c.readOpt(obj["kind"], c.checkStr),
     manualSync: c.readOpt(obj["manualSync"], c.checkBool),

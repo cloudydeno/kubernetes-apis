@@ -59,17 +59,34 @@ export function fromEndpointConditions(input: EndpointConditions): c.JSONValue {
 
 /** EndpointHints provides hints describing how an endpoint should be consumed. */
 export interface EndpointHints {
+  forNodes?: Array<ForNode> | null;
   forZones?: Array<ForZone> | null;
 }
 export function toEndpointHints(input: c.JSONValue): EndpointHints {
   const obj = c.checkObj(input);
   return {
+    forNodes: c.readOpt(obj["forNodes"], x => c.readList(x, toForNode)),
     forZones: c.readOpt(obj["forZones"], x => c.readList(x, toForZone)),
   }}
 export function fromEndpointHints(input: EndpointHints): c.JSONValue {
   return {
     ...input,
+    forNodes: input.forNodes?.map(fromForNode),
     forZones: input.forZones?.map(fromForZone),
+  }}
+
+/** ForNode provides information about which nodes should consume this endpoint. */
+export interface ForNode {
+  name: string;
+}
+export function toForNode(input: c.JSONValue): ForNode {
+  const obj = c.checkObj(input);
+  return {
+    name: c.checkStr(obj["name"]),
+  }}
+export function fromForNode(input: ForNode): c.JSONValue {
+  return {
+    ...input,
   }}
 
 /** ForZone provides information about which zones should consume this endpoint. */
@@ -106,7 +123,7 @@ export function fromEndpointPort(input: EndpointPort): c.JSONValue {
     ...input,
   }}
 
-/** EndpointSlice represents a subset of the endpoints that implement a service. For a given service there may be multiple EndpointSlice objects, selected by labels, which must be joined to produce the full set of endpoints. */
+/** EndpointSlice represents a set of service endpoints. Most EndpointSlices are created by the EndpointSlice controller to represent the Pods selected by Service objects. For a given service there may be multiple EndpointSlice objects which must be joined to produce the full set of endpoints; you can find all of the slices for a given service by listing EndpointSlices in the service's namespace whose `kubernetes.io/service-name` label contains the service's name. */
 export interface EndpointSlice {
   apiVersion?: "discovery.k8s.io/v1";
   kind?: "EndpointSlice";

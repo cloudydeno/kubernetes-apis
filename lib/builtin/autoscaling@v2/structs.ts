@@ -176,11 +176,16 @@ export function fromHPAScalingPolicy(input: HPAScalingPolicy): c.JSONValue {
     ...input,
   }}
 
-/** HPAScalingRules configures the scaling behavior for one direction. These Rules are applied after calculating DesiredReplicas from metrics for the HPA. They can limit the scaling velocity by specifying scaling policies. They can prevent flapping by specifying the stabilization window, so that the number of replicas is not set instantly, instead, the safest value from the stabilization window is chosen. */
+/** HPAScalingRules configures the scaling behavior for one direction via scaling Policy Rules and a configurable metric tolerance.
+
+Scaling Policy Rules are applied after calculating DesiredReplicas from metrics for the HPA. They can limit the scaling velocity by specifying scaling policies. They can prevent flapping by specifying the stabilization window, so that the number of replicas is not set instantly, instead, the safest value from the stabilization window is chosen.
+
+The tolerance is applied to the metric values and prevents scaling too eagerly for small metric variations. (Note that setting a tolerance requires enabling the alpha HPAConfigurableTolerance feature gate.) */
 export interface HPAScalingRules {
   policies?: Array<HPAScalingPolicy> | null;
   selectPolicy?: string | null;
   stabilizationWindowSeconds?: number | null;
+  tolerance?: c.Quantity | null;
 }
 export function toHPAScalingRules(input: c.JSONValue): HPAScalingRules {
   const obj = c.checkObj(input);
@@ -188,11 +193,13 @@ export function toHPAScalingRules(input: c.JSONValue): HPAScalingRules {
     policies: c.readOpt(obj["policies"], x => c.readList(x, toHPAScalingPolicy)),
     selectPolicy: c.readOpt(obj["selectPolicy"], c.checkStr),
     stabilizationWindowSeconds: c.readOpt(obj["stabilizationWindowSeconds"], c.checkNum),
+    tolerance: c.readOpt(obj["tolerance"], c.toQuantity),
   }}
 export function fromHPAScalingRules(input: HPAScalingRules): c.JSONValue {
   return {
     ...input,
     policies: input.policies?.map(fromHPAScalingPolicy),
+    tolerance: input.tolerance != null ? c.fromQuantity(input.tolerance) : undefined,
   }}
 
 /** HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified. */

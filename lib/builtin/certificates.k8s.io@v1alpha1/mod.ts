@@ -13,6 +13,14 @@ export class CertificatesV1alpha1Api {
     this.#client = client;
   }
 
+  namespace(name: string): CertificatesV1alpha1NamespacedApi {
+    return new CertificatesV1alpha1NamespacedApi(this.#client, name);
+  }
+  myNamespace(): CertificatesV1alpha1NamespacedApi {
+    if (!this.#client.defaultNamespace) throw new Error("No current namespace is set");
+    return new CertificatesV1alpha1NamespacedApi(this.#client, this.#client.defaultNamespace);
+  }
+
   async getClusterTrustBundleList(
     opts: operations.GetListOpts = {},
   ): Promise<CertificatesV1alpha1.ClusterTrustBundleList> {
@@ -128,6 +136,207 @@ export class CertificatesV1alpha1Api {
       abortSignal: opts.abortSignal,
     });
     return CertificatesV1alpha1.toClusterTrustBundle(resp);
+  }
+
+  async getPodCertificateRequestListForAllNamespaces(
+    opts: operations.GetListOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequestList> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}podcertificaterequests`,
+      expectJson: true,
+      querystring: operations.formatGetListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequestList(resp);
+  }
+
+  async watchPodCertificateRequestListForAllNamespaces(
+    opts: operations.WatchListOpts = {},
+  ): Promise<c.WatchEventStream<CertificatesV1alpha1.PodCertificateRequest>> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}podcertificaterequests`,
+      expectJson: true,
+      expectStream: true,
+      querystring: operations.formatWatchListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return resp.pipeThrough(new c.WatchEventTransformer(CertificatesV1alpha1.toPodCertificateRequest, MetaV1.toStatus));
+  }
+
+}
+
+export class CertificatesV1alpha1NamespacedApi {
+  #client: c.RestClient
+  #root: string
+  constructor(client: c.RestClient, namespace: string) {
+    this.#client = client;
+    this.#root = `/apis/certificates.k8s.io/v1alpha1/namespaces/${namespace}/`;
+  }
+
+  async getPodCertificateRequestList(
+    opts: operations.GetListOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequestList> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}podcertificaterequests`,
+      expectJson: true,
+      querystring: operations.formatGetListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequestList(resp);
+  }
+
+  async watchPodCertificateRequestList(
+    opts: operations.WatchListOpts = {},
+  ): Promise<c.WatchEventStream<CertificatesV1alpha1.PodCertificateRequest>> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}podcertificaterequests`,
+      expectJson: true,
+      expectStream: true,
+      querystring: operations.formatWatchListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return resp.pipeThrough(new c.WatchEventTransformer(CertificatesV1alpha1.toPodCertificateRequest, MetaV1.toStatus));
+  }
+
+  async createPodCertificateRequest(
+    body: CertificatesV1alpha1.PodCertificateRequest,
+    opts: operations.PutOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequest> {
+    const resp = await this.#client.performRequest({
+      method: "POST",
+      path: `${this.#root}podcertificaterequests`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: CertificatesV1alpha1.fromPodCertificateRequest(body),
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequest(resp);
+  }
+
+  async deletePodCertificateRequestList(
+    opts: operations.DeleteListOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequestList> {
+    const resp = await this.#client.performRequest({
+      method: "DELETE",
+      path: `${this.#root}podcertificaterequests`,
+      expectJson: true,
+      querystring: operations.formatDeleteListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequestList(resp);
+  }
+
+  async getPodCertificateRequest(
+    name: string,
+    opts: operations.NoOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequest> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}podcertificaterequests/${name}`,
+      expectJson: true,
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequest(resp);
+  }
+
+  async deletePodCertificateRequest(
+    name: string,
+    opts: operations.DeleteOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequest | MetaV1.Status> {
+    const resp = await this.#client.performRequest({
+      method: "DELETE",
+      path: `${this.#root}podcertificaterequests/${name}`,
+      expectJson: true,
+      querystring: operations.formatDeleteOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    if (c.isStatusKind(resp)) return MetaV1.toStatus(resp);
+    return CertificatesV1alpha1.toPodCertificateRequest(resp);
+  }
+
+  async replacePodCertificateRequest(
+    name: string,
+    body: CertificatesV1alpha1.PodCertificateRequest,
+    opts: operations.PutOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequest> {
+    const resp = await this.#client.performRequest({
+      method: "PUT",
+      path: `${this.#root}podcertificaterequests/${name}`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: CertificatesV1alpha1.fromPodCertificateRequest(body),
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequest(resp);
+  }
+
+  async patchPodCertificateRequest(
+    name: string,
+    type: c.PatchType,
+    body: CertificatesV1alpha1.PodCertificateRequest | c.JsonPatch,
+    opts: operations.PatchOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequest> {
+    const resp = await this.#client.performRequest({
+      method: "PATCH",
+      path: `${this.#root}podcertificaterequests/${name}`,
+      expectJson: true,
+      querystring: operations.formatPatchOpts(opts),
+      contentType: c.getPatchContentType(type),
+      bodyJson: Array.isArray(body) ? body : CertificatesV1alpha1.fromPodCertificateRequest(body),
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequest(resp);
+  }
+
+  async getPodCertificateRequestStatus(
+    name: string,
+    opts: operations.NoOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequest> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}podcertificaterequests/${name}/status`,
+      expectJson: true,
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequest(resp);
+  }
+
+  async replacePodCertificateRequestStatus(
+    name: string,
+    body: CertificatesV1alpha1.PodCertificateRequest,
+    opts: operations.PutOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequest> {
+    const resp = await this.#client.performRequest({
+      method: "PUT",
+      path: `${this.#root}podcertificaterequests/${name}/status`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: CertificatesV1alpha1.fromPodCertificateRequest(body),
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequest(resp);
+  }
+
+  async patchPodCertificateRequestStatus(
+    name: string,
+    type: c.PatchType,
+    body: CertificatesV1alpha1.PodCertificateRequest | c.JsonPatch,
+    opts: operations.PatchOpts = {},
+  ): Promise<CertificatesV1alpha1.PodCertificateRequest> {
+    const resp = await this.#client.performRequest({
+      method: "PATCH",
+      path: `${this.#root}podcertificaterequests/${name}/status`,
+      expectJson: true,
+      querystring: operations.formatPatchOpts(opts),
+      contentType: c.getPatchContentType(type),
+      bodyJson: Array.isArray(body) ? body : CertificatesV1alpha1.fromPodCertificateRequest(body),
+      abortSignal: opts.abortSignal,
+    });
+    return CertificatesV1alpha1.toPodCertificateRequest(resp);
   }
 
 }
