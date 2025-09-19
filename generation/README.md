@@ -1,6 +1,6 @@
-![Deno CI](https://github.com/danopia/deno-kubernetes_apis/workflows/CI/badge.svg?branch=main)
+[![CI](https://github.com/cloudydeno/kubernetes-apis/actions/workflows/deno-ci.yaml/badge.svg)](https://github.com/cloudydeno/kubernetes-apis/actions/workflows/deno-ci.yaml)
 
-# `/x/kubernetes_apis`
+# `@cloudydeno/kubernetes-apis`
 
 NOTE: This README is about code generation concepts.
 
