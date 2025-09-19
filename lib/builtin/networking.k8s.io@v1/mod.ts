@@ -165,6 +165,123 @@ export class NetworkingV1Api {
     return resp.pipeThrough(new c.WatchEventTransformer(NetworkingV1.toIngress, MetaV1.toStatus));
   }
 
+  async getIPAddressList(
+    opts: operations.GetListOpts = {},
+  ): Promise<NetworkingV1.IPAddressList> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}ipaddresses`,
+      expectJson: true,
+      querystring: operations.formatGetListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toIPAddressList(resp);
+  }
+
+  async watchIPAddressList(
+    opts: operations.WatchListOpts = {},
+  ): Promise<c.WatchEventStream<NetworkingV1.IPAddress>> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}ipaddresses`,
+      expectJson: true,
+      expectStream: true,
+      querystring: operations.formatWatchListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return resp.pipeThrough(new c.WatchEventTransformer(NetworkingV1.toIPAddress, MetaV1.toStatus));
+  }
+
+  async createIPAddress(
+    body: NetworkingV1.IPAddress,
+    opts: operations.PutOpts = {},
+  ): Promise<NetworkingV1.IPAddress> {
+    const resp = await this.#client.performRequest({
+      method: "POST",
+      path: `${this.#root}ipaddresses`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: NetworkingV1.fromIPAddress(body),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toIPAddress(resp);
+  }
+
+  async deleteIPAddressList(
+    opts: operations.DeleteListOpts = {},
+  ): Promise<NetworkingV1.IPAddressList> {
+    const resp = await this.#client.performRequest({
+      method: "DELETE",
+      path: `${this.#root}ipaddresses`,
+      expectJson: true,
+      querystring: operations.formatDeleteListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toIPAddressList(resp);
+  }
+
+  async getIPAddress(
+    name: string,
+    opts: operations.NoOpts = {},
+  ): Promise<NetworkingV1.IPAddress> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}ipaddresses/${name}`,
+      expectJson: true,
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toIPAddress(resp);
+  }
+
+  async deleteIPAddress(
+    name: string,
+    opts: operations.DeleteOpts = {},
+  ): Promise<NetworkingV1.IPAddress | MetaV1.Status> {
+    const resp = await this.#client.performRequest({
+      method: "DELETE",
+      path: `${this.#root}ipaddresses/${name}`,
+      expectJson: true,
+      querystring: operations.formatDeleteOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    if (c.isStatusKind(resp)) return MetaV1.toStatus(resp);
+    return NetworkingV1.toIPAddress(resp);
+  }
+
+  async replaceIPAddress(
+    name: string,
+    body: NetworkingV1.IPAddress,
+    opts: operations.PutOpts = {},
+  ): Promise<NetworkingV1.IPAddress> {
+    const resp = await this.#client.performRequest({
+      method: "PUT",
+      path: `${this.#root}ipaddresses/${name}`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: NetworkingV1.fromIPAddress(body),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toIPAddress(resp);
+  }
+
+  async patchIPAddress(
+    name: string,
+    type: c.PatchType,
+    body: NetworkingV1.IPAddress | c.JsonPatch,
+    opts: operations.PatchOpts = {},
+  ): Promise<NetworkingV1.IPAddress> {
+    const resp = await this.#client.performRequest({
+      method: "PATCH",
+      path: `${this.#root}ipaddresses/${name}`,
+      expectJson: true,
+      querystring: operations.formatPatchOpts(opts),
+      contentType: c.getPatchContentType(type),
+      bodyJson: Array.isArray(body) ? body : NetworkingV1.fromIPAddress(body),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toIPAddress(resp);
+  }
+
   async getNetworkPolicyListForAllNamespaces(
     opts: operations.GetListOpts = {},
   ): Promise<NetworkingV1.NetworkPolicyList> {
@@ -190,6 +307,170 @@ export class NetworkingV1Api {
       abortSignal: opts.abortSignal,
     });
     return resp.pipeThrough(new c.WatchEventTransformer(NetworkingV1.toNetworkPolicy, MetaV1.toStatus));
+  }
+
+  async getServiceCIDRList(
+    opts: operations.GetListOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDRList> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}servicecidrs`,
+      expectJson: true,
+      querystring: operations.formatGetListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toServiceCIDRList(resp);
+  }
+
+  async watchServiceCIDRList(
+    opts: operations.WatchListOpts = {},
+  ): Promise<c.WatchEventStream<NetworkingV1.ServiceCIDR>> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}servicecidrs`,
+      expectJson: true,
+      expectStream: true,
+      querystring: operations.formatWatchListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return resp.pipeThrough(new c.WatchEventTransformer(NetworkingV1.toServiceCIDR, MetaV1.toStatus));
+  }
+
+  async createServiceCIDR(
+    body: NetworkingV1.ServiceCIDR,
+    opts: operations.PutOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDR> {
+    const resp = await this.#client.performRequest({
+      method: "POST",
+      path: `${this.#root}servicecidrs`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: NetworkingV1.fromServiceCIDR(body),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toServiceCIDR(resp);
+  }
+
+  async deleteServiceCIDRList(
+    opts: operations.DeleteListOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDRList> {
+    const resp = await this.#client.performRequest({
+      method: "DELETE",
+      path: `${this.#root}servicecidrs`,
+      expectJson: true,
+      querystring: operations.formatDeleteListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toServiceCIDRList(resp);
+  }
+
+  async getServiceCIDR(
+    name: string,
+    opts: operations.NoOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDR> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}servicecidrs/${name}`,
+      expectJson: true,
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toServiceCIDR(resp);
+  }
+
+  async deleteServiceCIDR(
+    name: string,
+    opts: operations.DeleteOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDR | MetaV1.Status> {
+    const resp = await this.#client.performRequest({
+      method: "DELETE",
+      path: `${this.#root}servicecidrs/${name}`,
+      expectJson: true,
+      querystring: operations.formatDeleteOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    if (c.isStatusKind(resp)) return MetaV1.toStatus(resp);
+    return NetworkingV1.toServiceCIDR(resp);
+  }
+
+  async replaceServiceCIDR(
+    name: string,
+    body: NetworkingV1.ServiceCIDR,
+    opts: operations.PutOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDR> {
+    const resp = await this.#client.performRequest({
+      method: "PUT",
+      path: `${this.#root}servicecidrs/${name}`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: NetworkingV1.fromServiceCIDR(body),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toServiceCIDR(resp);
+  }
+
+  async patchServiceCIDR(
+    name: string,
+    type: c.PatchType,
+    body: NetworkingV1.ServiceCIDR | c.JsonPatch,
+    opts: operations.PatchOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDR> {
+    const resp = await this.#client.performRequest({
+      method: "PATCH",
+      path: `${this.#root}servicecidrs/${name}`,
+      expectJson: true,
+      querystring: operations.formatPatchOpts(opts),
+      contentType: c.getPatchContentType(type),
+      bodyJson: Array.isArray(body) ? body : NetworkingV1.fromServiceCIDR(body),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toServiceCIDR(resp);
+  }
+
+  async getServiceCIDRStatus(
+    name: string,
+    opts: operations.NoOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDR> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}servicecidrs/${name}/status`,
+      expectJson: true,
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toServiceCIDR(resp);
+  }
+
+  async replaceServiceCIDRStatus(
+    name: string,
+    body: NetworkingV1.ServiceCIDR,
+    opts: operations.PutOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDR> {
+    const resp = await this.#client.performRequest({
+      method: "PUT",
+      path: `${this.#root}servicecidrs/${name}/status`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: NetworkingV1.fromServiceCIDR(body),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toServiceCIDR(resp);
+  }
+
+  async patchServiceCIDRStatus(
+    name: string,
+    type: c.PatchType,
+    body: NetworkingV1.ServiceCIDR | c.JsonPatch,
+    opts: operations.PatchOpts = {},
+  ): Promise<NetworkingV1.ServiceCIDR> {
+    const resp = await this.#client.performRequest({
+      method: "PATCH",
+      path: `${this.#root}servicecidrs/${name}/status`,
+      expectJson: true,
+      querystring: operations.formatPatchOpts(opts),
+      contentType: c.getPatchContentType(type),
+      bodyJson: Array.isArray(body) ? body : NetworkingV1.fromServiceCIDR(body),
+      abortSignal: opts.abortSignal,
+    });
+    return NetworkingV1.toServiceCIDR(resp);
   }
 
 }

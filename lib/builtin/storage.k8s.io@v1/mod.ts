@@ -563,6 +563,123 @@ export class StorageV1Api {
     return StorageV1.toVolumeAttachment(resp);
   }
 
+  async getVolumeAttributesClassList(
+    opts: operations.GetListOpts = {},
+  ): Promise<StorageV1.VolumeAttributesClassList> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}volumeattributesclasses`,
+      expectJson: true,
+      querystring: operations.formatGetListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return StorageV1.toVolumeAttributesClassList(resp);
+  }
+
+  async watchVolumeAttributesClassList(
+    opts: operations.WatchListOpts = {},
+  ): Promise<c.WatchEventStream<StorageV1.VolumeAttributesClass>> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}volumeattributesclasses`,
+      expectJson: true,
+      expectStream: true,
+      querystring: operations.formatWatchListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return resp.pipeThrough(new c.WatchEventTransformer(StorageV1.toVolumeAttributesClass, MetaV1.toStatus));
+  }
+
+  async createVolumeAttributesClass(
+    body: StorageV1.VolumeAttributesClass,
+    opts: operations.PutOpts = {},
+  ): Promise<StorageV1.VolumeAttributesClass> {
+    const resp = await this.#client.performRequest({
+      method: "POST",
+      path: `${this.#root}volumeattributesclasses`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: StorageV1.fromVolumeAttributesClass(body),
+      abortSignal: opts.abortSignal,
+    });
+    return StorageV1.toVolumeAttributesClass(resp);
+  }
+
+  async deleteVolumeAttributesClassList(
+    opts: operations.DeleteListOpts = {},
+  ): Promise<StorageV1.VolumeAttributesClassList> {
+    const resp = await this.#client.performRequest({
+      method: "DELETE",
+      path: `${this.#root}volumeattributesclasses`,
+      expectJson: true,
+      querystring: operations.formatDeleteListOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    return StorageV1.toVolumeAttributesClassList(resp);
+  }
+
+  async getVolumeAttributesClass(
+    name: string,
+    opts: operations.NoOpts = {},
+  ): Promise<StorageV1.VolumeAttributesClass> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}volumeattributesclasses/${name}`,
+      expectJson: true,
+      abortSignal: opts.abortSignal,
+    });
+    return StorageV1.toVolumeAttributesClass(resp);
+  }
+
+  async deleteVolumeAttributesClass(
+    name: string,
+    opts: operations.DeleteOpts = {},
+  ): Promise<StorageV1.VolumeAttributesClass | MetaV1.Status> {
+    const resp = await this.#client.performRequest({
+      method: "DELETE",
+      path: `${this.#root}volumeattributesclasses/${name}`,
+      expectJson: true,
+      querystring: operations.formatDeleteOpts(opts),
+      abortSignal: opts.abortSignal,
+    });
+    if (c.isStatusKind(resp)) return MetaV1.toStatus(resp);
+    return StorageV1.toVolumeAttributesClass(resp);
+  }
+
+  async replaceVolumeAttributesClass(
+    name: string,
+    body: StorageV1.VolumeAttributesClass,
+    opts: operations.PutOpts = {},
+  ): Promise<StorageV1.VolumeAttributesClass> {
+    const resp = await this.#client.performRequest({
+      method: "PUT",
+      path: `${this.#root}volumeattributesclasses/${name}`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: StorageV1.fromVolumeAttributesClass(body),
+      abortSignal: opts.abortSignal,
+    });
+    return StorageV1.toVolumeAttributesClass(resp);
+  }
+
+  async patchVolumeAttributesClass(
+    name: string,
+    type: c.PatchType,
+    body: StorageV1.VolumeAttributesClass | c.JsonPatch,
+    opts: operations.PatchOpts = {},
+  ): Promise<StorageV1.VolumeAttributesClass> {
+    const resp = await this.#client.performRequest({
+      method: "PATCH",
+      path: `${this.#root}volumeattributesclasses/${name}`,
+      expectJson: true,
+      querystring: operations.formatPatchOpts(opts),
+      contentType: c.getPatchContentType(type),
+      bodyJson: Array.isArray(body) ? body : StorageV1.fromVolumeAttributesClass(body),
+      abortSignal: opts.abortSignal,
+    });
+    return StorageV1.toVolumeAttributesClass(resp);
+  }
+
 }
 
 export class StorageV1NamespacedApi {

@@ -109,6 +109,7 @@ export interface Order {
       kind?: string | null;
       name: string;
     };
+    profile?: string | null;
     request: string;
   };
   status?: {
@@ -157,6 +158,7 @@ function toOrder_spec(input: c.JSONValue) {
     duration: c.readOpt(obj["duration"], c.checkStr),
     ipAddresses: c.readOpt(obj["ipAddresses"], x => c.readList(x, c.checkStr)),
     issuerRef: toOrder_spec_issuerRef(obj["issuerRef"]),
+    profile: c.readOpt(obj["profile"], c.checkStr),
     request: c.checkStr(obj["request"]),
   }}
 function toOrder_status(input: c.JSONValue) {

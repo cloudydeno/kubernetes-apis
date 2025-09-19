@@ -1,17 +1,18 @@
 #!/bin/sh -eux
 
-gitapi="https://api.github.com"
-upstream="kubernetes-sigs/external-dns"
-crdpath="config/crd/standard"
-projectname="external-dns"
+rawapi="raw.githubusercontent.com"
+upstream="fluxcd/flux2"
+kustomizationpath="manifests/crds/kustomization.yaml"
+projectname="flux-cd"
 specdir="generation/api-specs/$projectname-$1"
 
 if [ ! -d "$specdir" ]
 then {
   echo 'mkdir '"$specdir"
   echo 'cd '"$specdir"
-  wget -O - "$gitapi/repos/$upstream/contents/$crdpath?ref=$1" \
-  | jq -r '.[] | select(.name | endswith(".yaml")) | "wget \(.download_url)"'
+  wget -O - "https://$rawapi/$upstream/refs/tags/$1/$kustomizationpath" \
+  | grep -E 'https:.+[.]yaml' \
+  | sed 's/^- /wget /'
 } | sh -eux
 fi
 

@@ -165,11 +165,13 @@ export interface Certificate {
       jks?: {
         alias?: string | null;
         create: boolean;
-        passwordSecretRef: SecretRef;
+        password?: string | null;
+        passwordSecretRef?: SecretRef | null;
       } | null;
       pkcs12?: {
         create: boolean;
-        passwordSecretRef: SecretRef;
+        password?: string | null;
+        passwordSecretRef?: SecretRef | null;
         profile?: "LegacyRC2" | "LegacyDES" | "Modern2023" | c.UnexpectedEnumValue | null;
       } | null;
     } | null;
@@ -207,6 +209,7 @@ export interface Certificate {
       annotations?: Record<string,string> | null;
       labels?: Record<string,string> | null;
     } | null;
+    signatureAlgorithm?: "SHA256WithRSA" | "SHA384WithRSA" | "SHA512WithRSA" | "ECDSAWithSHA256" | "ECDSAWithSHA384" | "ECDSAWithSHA512" | "PureEd25519" | c.UnexpectedEnumValue | null;
     subject?: {
       countries?: Array<string> | null;
       localities?: Array<string> | null;
@@ -299,6 +302,7 @@ function toCertificate_spec(input: c.JSONValue) {
     revisionHistoryLimit: c.readOpt(obj["revisionHistoryLimit"], c.checkNum),
     secretName: c.checkStr(obj["secretName"]),
     secretTemplate: c.readOpt(obj["secretTemplate"], toCertificate_spec_secretTemplate),
+    signatureAlgorithm: c.readOpt(obj["signatureAlgorithm"], (x => c.readEnum<"SHA256WithRSA" | "SHA384WithRSA" | "SHA512WithRSA" | "ECDSAWithSHA256" | "ECDSAWithSHA384" | "ECDSAWithSHA512" | "PureEd25519" | c.UnexpectedEnumValue>(x))),
     subject: c.readOpt(obj["subject"], toCertificate_spec_subject),
     uris: c.readOpt(obj["uris"], x => c.readList(x, c.checkStr)),
     usages: c.readOpt(obj["usages"], x => c.readList(x, (x => c.readEnum<"signing" | "digital signature" | "content commitment" | "key encipherment" | "key agreement" | "data encipherment" | "cert sign" | "crl sign" | "encipher only" | "decipher only" | "any" | "server auth" | "client auth" | "code signing" | "email protection" | "s/mime" | "ipsec end system" | "ipsec tunnel" | "ipsec user" | "timestamping" | "ocsp signing" | "microsoft sgc" | "netscape sgc" | c.UnexpectedEnumValue>(x)))),
@@ -387,13 +391,15 @@ function toCertificate_spec_keystores_jks(input: c.JSONValue) {
   return {
     alias: c.readOpt(obj["alias"], c.checkStr),
     create: c.checkBool(obj["create"]),
-    passwordSecretRef: toSecretRef(obj["passwordSecretRef"]),
+    password: c.readOpt(obj["password"], c.checkStr),
+    passwordSecretRef: c.readOpt(obj["passwordSecretRef"], toSecretRef),
   }}
 function toCertificate_spec_keystores_pkcs12(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
     create: c.checkBool(obj["create"]),
-    passwordSecretRef: toSecretRef(obj["passwordSecretRef"]),
+    password: c.readOpt(obj["password"], c.checkStr),
+    passwordSecretRef: c.readOpt(obj["passwordSecretRef"], toSecretRef),
     profile: c.readOpt(obj["profile"], (x => c.readEnum<"LegacyRC2" | "LegacyDES" | "Modern2023" | c.UnexpectedEnumValue>(x))),
   }}
 function toCertificate_spec_nameConstraints_excluded(input: c.JSONValue) {
@@ -439,6 +445,7 @@ export interface IssuerSpec {
     } | null;
     preferredChain?: string | null;
     privateKeySecretRef: SecretRef;
+    profile?: string | null;
     server: string;
     skipTLSVerify?: boolean | null;
     solvers?: Array<SolverSpec> | null;
@@ -482,6 +489,7 @@ export interface IssuerSpec {
     namespace?: string | null;
     path: string;
     server: string;
+    serverName?: string | null;
   } | null;
   venafi?: {
     cloud?: {
@@ -560,6 +568,7 @@ function toIssuerSpec_acme(input: c.JSONValue) {
     externalAccountBinding: c.readOpt(obj["externalAccountBinding"], toIssuerSpec_acme_externalAccountBinding),
     preferredChain: c.readOpt(obj["preferredChain"], c.checkStr),
     privateKeySecretRef: toSecretRef(obj["privateKeySecretRef"]),
+    profile: c.readOpt(obj["profile"], c.checkStr),
     server: c.checkStr(obj["server"]),
     skipTLSVerify: c.readOpt(obj["skipTLSVerify"], c.checkBool),
     solvers: c.readOpt(obj["solvers"], x => c.readList(x, toSolverSpec)),
@@ -588,6 +597,7 @@ function toIssuerSpec_vault(input: c.JSONValue) {
     namespace: c.readOpt(obj["namespace"], c.checkStr),
     path: c.checkStr(obj["path"]),
     server: c.checkStr(obj["server"]),
+    serverName: c.readOpt(obj["serverName"], c.checkStr),
   }}
 function toIssuerSpec_venafi(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -682,6 +692,7 @@ export interface SolverSpec {
       managedIdentity?: {
         clientID?: string | null;
         resourceID?: string | null;
+        tenantID?: string | null;
       } | null;
       resourceGroupName: string;
       subscriptionID: string;
@@ -1043,6 +1054,7 @@ function toSolverSpec_dns01_azureDNS_managedIdentity(input: c.JSONValue) {
   return {
     clientID: c.readOpt(obj["clientID"], c.checkStr),
     resourceID: c.readOpt(obj["resourceID"], c.checkStr),
+    tenantID: c.readOpt(obj["tenantID"], c.checkStr),
   }}
 function toSolverSpec_dns01_route53_auth(input: c.JSONValue) {
   const obj = c.checkObj(input);

@@ -293,6 +293,7 @@ export interface DeploymentStatus {
   observedGeneration?: number | null;
   readyReplicas?: number | null;
   replicas?: number | null;
+  terminatingReplicas?: number | null;
   unavailableReplicas?: number | null;
   updatedReplicas?: number | null;
 }
@@ -305,6 +306,7 @@ export function toDeploymentStatus(input: c.JSONValue): DeploymentStatus {
     observedGeneration: c.readOpt(obj["observedGeneration"], c.checkNum),
     readyReplicas: c.readOpt(obj["readyReplicas"], c.checkNum),
     replicas: c.readOpt(obj["replicas"], c.checkNum),
+    terminatingReplicas: c.readOpt(obj["terminatingReplicas"], c.checkNum),
     unavailableReplicas: c.readOpt(obj["unavailableReplicas"], c.checkNum),
     updatedReplicas: c.readOpt(obj["updatedReplicas"], c.checkNum),
   }}
@@ -408,6 +410,7 @@ export interface ReplicaSetStatus {
   observedGeneration?: number | null;
   readyReplicas?: number | null;
   replicas: number;
+  terminatingReplicas?: number | null;
 }
 export function toReplicaSetStatus(input: c.JSONValue): ReplicaSetStatus {
   const obj = c.checkObj(input);
@@ -418,6 +421,7 @@ export function toReplicaSetStatus(input: c.JSONValue): ReplicaSetStatus {
     observedGeneration: c.readOpt(obj["observedGeneration"], c.checkNum),
     readyReplicas: c.readOpt(obj["readyReplicas"], c.checkNum),
     replicas: c.checkNum(obj["replicas"]),
+    terminatingReplicas: c.readOpt(obj["terminatingReplicas"], c.checkNum),
   }}
 export function fromReplicaSetStatus(input: ReplicaSetStatus): c.JSONValue {
   return {
@@ -515,7 +519,7 @@ export interface StatefulSetSpec {
   replicas?: number | null;
   revisionHistoryLimit?: number | null;
   selector: MetaV1.LabelSelector;
-  serviceName: string;
+  serviceName?: string | null;
   template: CoreV1.PodTemplateSpec;
   updateStrategy?: StatefulSetUpdateStrategy | null;
   volumeClaimTemplates?: Array<CoreV1.PersistentVolumeClaim> | null;
@@ -530,7 +534,7 @@ export function toStatefulSetSpec(input: c.JSONValue): StatefulSetSpec {
     replicas: c.readOpt(obj["replicas"], c.checkNum),
     revisionHistoryLimit: c.readOpt(obj["revisionHistoryLimit"], c.checkNum),
     selector: MetaV1.toLabelSelector(obj["selector"]),
-    serviceName: c.checkStr(obj["serviceName"]),
+    serviceName: c.readOpt(obj["serviceName"], c.checkStr),
     template: CoreV1.toPodTemplateSpec(obj["template"]),
     updateStrategy: c.readOpt(obj["updateStrategy"], toStatefulSetUpdateStrategy),
     volumeClaimTemplates: c.readOpt(obj["volumeClaimTemplates"], x => c.readList(x, CoreV1.toPersistentVolumeClaim)),

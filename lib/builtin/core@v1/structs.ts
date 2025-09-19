@@ -821,6 +821,7 @@ export interface Container {
   resizePolicy?: Array<ContainerResizePolicy> | null;
   resources?: ResourceRequirements | null;
   restartPolicy?: string | null;
+  restartPolicyRules?: Array<ContainerRestartRule> | null;
   securityContext?: SecurityContext | null;
   startupProbe?: Probe | null;
   stdin?: boolean | null;
@@ -849,6 +850,7 @@ export function toContainer(input: c.JSONValue): Container {
     resizePolicy: c.readOpt(obj["resizePolicy"], x => c.readList(x, toContainerResizePolicy)),
     resources: c.readOpt(obj["resources"], toResourceRequirements),
     restartPolicy: c.readOpt(obj["restartPolicy"], c.checkStr),
+    restartPolicyRules: c.readOpt(obj["restartPolicyRules"], x => c.readList(x, toContainerRestartRule)),
     securityContext: c.readOpt(obj["securityContext"], toSecurityContext),
     startupProbe: c.readOpt(obj["startupProbe"], toProbe),
     stdin: c.readOpt(obj["stdin"], c.checkBool),
@@ -871,6 +873,7 @@ export function fromContainer(input: Container): c.JSONValue {
     readinessProbe: input.readinessProbe != null ? fromProbe(input.readinessProbe) : undefined,
     resizePolicy: input.resizePolicy?.map(fromContainerResizePolicy),
     resources: input.resources != null ? fromResourceRequirements(input.resources) : undefined,
+    restartPolicyRules: input.restartPolicyRules?.map(fromContainerRestartRule),
     securityContext: input.securityContext != null ? fromSecurityContext(input.securityContext) : undefined,
     startupProbe: input.startupProbe != null ? fromProbe(input.startupProbe) : undefined,
     volumeDevices: input.volumeDevices?.map(fromVolumeDevice),
@@ -900,6 +903,7 @@ export function fromEnvVar(input: EnvVar): c.JSONValue {
 export interface EnvVarSource {
   configMapKeyRef?: ConfigMapKeySelector | null;
   fieldRef?: ObjectFieldSelector | null;
+  fileKeyRef?: FileKeySelector | null;
   resourceFieldRef?: ResourceFieldSelector | null;
   secretKeyRef?: SecretKeySelector | null;
 }
@@ -908,6 +912,7 @@ export function toEnvVarSource(input: c.JSONValue): EnvVarSource {
   return {
     configMapKeyRef: c.readOpt(obj["configMapKeyRef"], toConfigMapKeySelector),
     fieldRef: c.readOpt(obj["fieldRef"], toObjectFieldSelector),
+    fileKeyRef: c.readOpt(obj["fileKeyRef"], toFileKeySelector),
     resourceFieldRef: c.readOpt(obj["resourceFieldRef"], toResourceFieldSelector),
     secretKeyRef: c.readOpt(obj["secretKeyRef"], toSecretKeySelector),
   }}
@@ -916,6 +921,7 @@ export function fromEnvVarSource(input: EnvVarSource): c.JSONValue {
     ...input,
     configMapKeyRef: input.configMapKeyRef != null ? fromConfigMapKeySelector(input.configMapKeyRef) : undefined,
     fieldRef: input.fieldRef != null ? fromObjectFieldSelector(input.fieldRef) : undefined,
+    fileKeyRef: input.fileKeyRef != null ? fromFileKeySelector(input.fileKeyRef) : undefined,
     resourceFieldRef: input.resourceFieldRef != null ? fromResourceFieldSelector(input.resourceFieldRef) : undefined,
     secretKeyRef: input.secretKeyRef != null ? fromSecretKeySelector(input.secretKeyRef) : undefined,
   }}
@@ -932,6 +938,26 @@ export function toObjectFieldSelector(input: c.JSONValue): ObjectFieldSelector {
     fieldPath: c.checkStr(obj["fieldPath"]),
   }}
 export function fromObjectFieldSelector(input: ObjectFieldSelector): c.JSONValue {
+  return {
+    ...input,
+  }}
+
+/** FileKeySelector selects a key of the env file. */
+export interface FileKeySelector {
+  key: string;
+  optional?: boolean | null;
+  path: string;
+  volumeName: string;
+}
+export function toFileKeySelector(input: c.JSONValue): FileKeySelector {
+  const obj = c.checkObj(input);
+  return {
+    key: c.checkStr(obj["key"]),
+    optional: c.readOpt(obj["optional"], c.checkBool),
+    path: c.checkStr(obj["path"]),
+    volumeName: c.checkStr(obj["volumeName"]),
+  }}
+export function fromFileKeySelector(input: FileKeySelector): c.JSONValue {
   return {
     ...input,
   }}
@@ -973,7 +999,7 @@ export function fromSecretKeySelector(input: SecretKeySelector): c.JSONValue {
     ...input,
   }}
 
-/** EnvFromSource represents the source of a set of ConfigMaps */
+/** EnvFromSource represents the source of a set of ConfigMaps or Secrets */
 export interface EnvFromSource {
   configMapRef?: ConfigMapEnvSource | null;
   prefix?: string | null;
@@ -1015,12 +1041,14 @@ export function fromSecretEnvSource(input: SecretEnvSource): c.JSONValue {
 export interface Lifecycle {
   postStart?: LifecycleHandler | null;
   preStop?: LifecycleHandler | null;
+  stopSignal?: string | null;
 }
 export function toLifecycle(input: c.JSONValue): Lifecycle {
   const obj = c.checkObj(input);
   return {
     postStart: c.readOpt(obj["postStart"], toLifecycleHandler),
     preStop: c.readOpt(obj["preStop"], toLifecycleHandler),
+    stopSignal: c.readOpt(obj["stopSignal"], c.checkStr),
   }}
 export function fromLifecycle(input: Lifecycle): c.JSONValue {
   return {
@@ -1263,6 +1291,39 @@ export function fromResourceClaim(input: ResourceClaim): c.JSONValue {
     ...input,
   }}
 
+/** ContainerRestartRule describes how a container exit is handled. */
+export interface ContainerRestartRule {
+  action: string;
+  exitCodes?: ContainerRestartRuleOnExitCodes | null;
+}
+export function toContainerRestartRule(input: c.JSONValue): ContainerRestartRule {
+  const obj = c.checkObj(input);
+  return {
+    action: c.checkStr(obj["action"]),
+    exitCodes: c.readOpt(obj["exitCodes"], toContainerRestartRuleOnExitCodes),
+  }}
+export function fromContainerRestartRule(input: ContainerRestartRule): c.JSONValue {
+  return {
+    ...input,
+    exitCodes: input.exitCodes != null ? fromContainerRestartRuleOnExitCodes(input.exitCodes) : undefined,
+  }}
+
+/** ContainerRestartRuleOnExitCodes describes the condition for handling an exited container based on its exit codes. */
+export interface ContainerRestartRuleOnExitCodes {
+  operator: string;
+  values?: Array<number> | null;
+}
+export function toContainerRestartRuleOnExitCodes(input: c.JSONValue): ContainerRestartRuleOnExitCodes {
+  const obj = c.checkObj(input);
+  return {
+    operator: c.checkStr(obj["operator"]),
+    values: c.readOpt(obj["values"], x => c.readList(x, c.checkNum)),
+  }}
+export function fromContainerRestartRuleOnExitCodes(input: ContainerRestartRuleOnExitCodes): c.JSONValue {
+  return {
+    ...input,
+  }}
+
 /** SecurityContext holds security configuration that will be applied to a container. Some fields are present in both SecurityContext and PodSecurityContext.  When both are set, the values in SecurityContext take precedence. */
 export interface SecurityContext {
   allowPrivilegeEscalation?: boolean | null;
@@ -1402,6 +1463,24 @@ export function fromVolumeMount(input: VolumeMount): c.JSONValue {
     ...input,
   }}
 
+/** ContainerExtendedResourceRequest has the mapping of container name, extended resource name to the device request name. */
+export interface ContainerExtendedResourceRequest {
+  containerName: string;
+  requestName: string;
+  resourceName: string;
+}
+export function toContainerExtendedResourceRequest(input: c.JSONValue): ContainerExtendedResourceRequest {
+  const obj = c.checkObj(input);
+  return {
+    containerName: c.checkStr(obj["containerName"]),
+    requestName: c.checkStr(obj["requestName"]),
+    resourceName: c.checkStr(obj["resourceName"]),
+  }}
+export function fromContainerExtendedResourceRequest(input: ContainerExtendedResourceRequest): c.JSONValue {
+  return {
+    ...input,
+  }}
+
 /** Describe a container image */
 export interface ContainerImage {
   names?: Array<string> | null;
@@ -1512,6 +1591,7 @@ export interface ContainerStatus {
   restartCount: number;
   started?: boolean | null;
   state?: ContainerState | null;
+  stopSignal?: string | null;
   user?: ContainerUser | null;
   volumeMounts?: Array<VolumeMountStatus> | null;
 }
@@ -1530,6 +1610,7 @@ export function toContainerStatus(input: c.JSONValue): ContainerStatus {
     restartCount: c.checkNum(obj["restartCount"]),
     started: c.readOpt(obj["started"], c.checkBool),
     state: c.readOpt(obj["state"], toContainerState),
+    stopSignal: c.readOpt(obj["stopSignal"], c.checkStr),
     user: c.readOpt(obj["user"], toContainerUser),
     volumeMounts: c.readOpt(obj["volumeMounts"], x => c.readList(x, toVolumeMountStatus)),
   }}
@@ -1716,7 +1797,7 @@ export function fromEmptyDirVolumeSource(input: EmptyDirVolumeSource): c.JSONVal
     sizeLimit: input.sizeLimit != null ? c.fromQuantity(input.sizeLimit) : undefined,
   }}
 
-/** EndpointAddress is a tuple that describes single IP address. */
+/** EndpointAddress is a tuple that describes single IP address. Deprecated: This API is deprecated in v1.33+. */
 export interface EndpointAddress {
   hostname?: string | null;
   ip: string;
@@ -1737,7 +1818,7 @@ export function fromEndpointAddress(input: EndpointAddress): c.JSONValue {
     targetRef: input.targetRef != null ? fromObjectReference(input.targetRef) : undefined,
   }}
 
-/** EndpointPort is a tuple that describes a single port. */
+/** EndpointPort is a tuple that describes a single port. Deprecated: This API is deprecated in v1.33+. */
 export interface EndpointPort {
   appProtocol?: string | null;
   name?: string | null;
@@ -1767,7 +1848,9 @@ export function fromEndpointPort(input: EndpointPort): c.JSONValue {
 The resulting set of endpoints can be viewed as:
 
 	a: [ 10.10.1.1:8675, 10.10.2.2:8675 ],
-	b: [ 10.10.1.1:309, 10.10.2.2:309 ] */
+	b: [ 10.10.1.1:309, 10.10.2.2:309 ]
+
+Deprecated: This API is deprecated in v1.33+. */
 export interface EndpointSubset {
   addresses?: Array<EndpointAddress> | null;
   notReadyAddresses?: Array<EndpointAddress> | null;
@@ -1800,7 +1883,11 @@ export function fromEndpointSubset(input: EndpointSubset): c.JSONValue {
 	     Addresses: [{"ip": "10.10.3.3"}],
 	     Ports: [{"name": "a", "port": 93}, {"name": "b", "port": 76}]
 	   },
-	] */
+	]
+
+Endpoints is a legacy API and does not contain information about all Service features. Use discoveryv1.EndpointSlice for complete information about Service endpoints.
+
+Deprecated: This API is deprecated in v1.33+. Use discoveryv1.EndpointSlice. */
 export interface Endpoints {
   apiVersion?: "v1";
   kind?: "Endpoints";
@@ -1822,7 +1909,7 @@ export function fromEndpoints(input: Endpoints): c.JSONValue {
     subsets: input.subsets?.map(fromEndpointSubset),
   }}
 
-/** EndpointsList is a list of endpoints. */
+/** EndpointsList is a list of endpoints. Deprecated: This API is deprecated in v1.33+. */
 export interface EndpointsList extends ListOf<Endpoints> {
   apiVersion?: "v1";
   kind?: "EndpointsList";
@@ -1853,6 +1940,7 @@ export interface EphemeralContainer {
   resizePolicy?: Array<ContainerResizePolicy> | null;
   resources?: ResourceRequirements | null;
   restartPolicy?: string | null;
+  restartPolicyRules?: Array<ContainerRestartRule> | null;
   securityContext?: SecurityContext | null;
   startupProbe?: Probe | null;
   stdin?: boolean | null;
@@ -1882,6 +1970,7 @@ export function toEphemeralContainer(input: c.JSONValue): EphemeralContainer {
     resizePolicy: c.readOpt(obj["resizePolicy"], x => c.readList(x, toContainerResizePolicy)),
     resources: c.readOpt(obj["resources"], toResourceRequirements),
     restartPolicy: c.readOpt(obj["restartPolicy"], c.checkStr),
+    restartPolicyRules: c.readOpt(obj["restartPolicyRules"], x => c.readList(x, toContainerRestartRule)),
     securityContext: c.readOpt(obj["securityContext"], toSecurityContext),
     startupProbe: c.readOpt(obj["startupProbe"], toProbe),
     stdin: c.readOpt(obj["stdin"], c.checkBool),
@@ -1905,6 +1994,7 @@ export function fromEphemeralContainer(input: EphemeralContainer): c.JSONValue {
     readinessProbe: input.readinessProbe != null ? fromProbe(input.readinessProbe) : undefined,
     resizePolicy: input.resizePolicy?.map(fromContainerResizePolicy),
     resources: input.resources != null ? fromResourceRequirements(input.resources) : undefined,
+    restartPolicyRules: input.restartPolicyRules?.map(fromContainerRestartRule),
     securityContext: input.securityContext != null ? fromSecurityContext(input.securityContext) : undefined,
     startupProbe: input.startupProbe != null ? fromProbe(input.startupProbe) : undefined,
     volumeDevices: input.volumeDevices?.map(fromVolumeDevice),
@@ -2948,6 +3038,7 @@ export interface NodeSystemInfo {
   machineID: string;
   operatingSystem: string;
   osImage: string;
+  swap?: NodeSwapStatus | null;
   systemUUID: string;
 }
 export function toNodeSystemInfo(input: c.JSONValue): NodeSystemInfo {
@@ -2962,9 +3053,25 @@ export function toNodeSystemInfo(input: c.JSONValue): NodeSystemInfo {
     machineID: c.checkStr(obj["machineID"]),
     operatingSystem: c.checkStr(obj["operatingSystem"]),
     osImage: c.checkStr(obj["osImage"]),
+    swap: c.readOpt(obj["swap"], toNodeSwapStatus),
     systemUUID: c.checkStr(obj["systemUUID"]),
   }}
 export function fromNodeSystemInfo(input: NodeSystemInfo): c.JSONValue {
+  return {
+    ...input,
+    swap: input.swap != null ? fromNodeSwapStatus(input.swap) : undefined,
+  }}
+
+/** NodeSwapStatus represents swap memory information. */
+export interface NodeSwapStatus {
+  capacity?: number | null;
+}
+export function toNodeSwapStatus(input: c.JSONValue): NodeSwapStatus {
+  const obj = c.checkObj(input);
+  return {
+    capacity: c.readOpt(obj["capacity"], c.checkNum),
+  }}
+export function fromNodeSwapStatus(input: NodeSwapStatus): c.JSONValue {
   return {
     ...input,
   }}
@@ -3504,6 +3611,7 @@ export interface PodSpec {
   hostPID?: boolean | null;
   hostUsers?: boolean | null;
   hostname?: string | null;
+  hostnameOverride?: string | null;
   imagePullSecrets?: Array<LocalObjectReference> | null;
   initContainers?: Array<Container> | null;
   nodeName?: string | null;
@@ -3548,6 +3656,7 @@ export function toPodSpec(input: c.JSONValue): PodSpec {
     hostPID: c.readOpt(obj["hostPID"], c.checkBool),
     hostUsers: c.readOpt(obj["hostUsers"], c.checkBool),
     hostname: c.readOpt(obj["hostname"], c.checkStr),
+    hostnameOverride: c.readOpt(obj["hostnameOverride"], c.checkStr),
     imagePullSecrets: c.readOpt(obj["imagePullSecrets"], x => c.readList(x, toLocalObjectReference)),
     initContainers: c.readOpt(obj["initContainers"], x => c.readList(x, toContainer)),
     nodeName: c.readOpt(obj["nodeName"], c.checkStr),
@@ -3930,6 +4039,7 @@ export interface VolumeProjection {
   clusterTrustBundle?: ClusterTrustBundleProjection | null;
   configMap?: ConfigMapProjection | null;
   downwardAPI?: DownwardAPIProjection | null;
+  podCertificate?: PodCertificateProjection | null;
   secret?: SecretProjection | null;
   serviceAccountToken?: ServiceAccountTokenProjection | null;
 }
@@ -3939,6 +4049,7 @@ export function toVolumeProjection(input: c.JSONValue): VolumeProjection {
     clusterTrustBundle: c.readOpt(obj["clusterTrustBundle"], toClusterTrustBundleProjection),
     configMap: c.readOpt(obj["configMap"], toConfigMapProjection),
     downwardAPI: c.readOpt(obj["downwardAPI"], toDownwardAPIProjection),
+    podCertificate: c.readOpt(obj["podCertificate"], toPodCertificateProjection),
     secret: c.readOpt(obj["secret"], toSecretProjection),
     serviceAccountToken: c.readOpt(obj["serviceAccountToken"], toServiceAccountTokenProjection),
   }}
@@ -3948,8 +4059,33 @@ export function fromVolumeProjection(input: VolumeProjection): c.JSONValue {
     clusterTrustBundle: input.clusterTrustBundle != null ? fromClusterTrustBundleProjection(input.clusterTrustBundle) : undefined,
     configMap: input.configMap != null ? fromConfigMapProjection(input.configMap) : undefined,
     downwardAPI: input.downwardAPI != null ? fromDownwardAPIProjection(input.downwardAPI) : undefined,
+    podCertificate: input.podCertificate != null ? fromPodCertificateProjection(input.podCertificate) : undefined,
     secret: input.secret != null ? fromSecretProjection(input.secret) : undefined,
     serviceAccountToken: input.serviceAccountToken != null ? fromServiceAccountTokenProjection(input.serviceAccountToken) : undefined,
+  }}
+
+/** PodCertificateProjection provides a private key and X.509 certificate in the pod filesystem. */
+export interface PodCertificateProjection {
+  certificateChainPath?: string | null;
+  credentialBundlePath?: string | null;
+  keyPath?: string | null;
+  keyType: string;
+  maxExpirationSeconds?: number | null;
+  signerName: string;
+}
+export function toPodCertificateProjection(input: c.JSONValue): PodCertificateProjection {
+  const obj = c.checkObj(input);
+  return {
+    certificateChainPath: c.readOpt(obj["certificateChainPath"], c.checkStr),
+    credentialBundlePath: c.readOpt(obj["credentialBundlePath"], c.checkStr),
+    keyPath: c.readOpt(obj["keyPath"], c.checkStr),
+    keyType: c.checkStr(obj["keyType"]),
+    maxExpirationSeconds: c.readOpt(obj["maxExpirationSeconds"], c.checkNum),
+    signerName: c.checkStr(obj["signerName"]),
+  }}
+export function fromPodCertificateProjection(input: PodCertificateProjection): c.JSONValue {
+  return {
+    ...input,
   }}
 
 /** Adapts a secret into a projected volume.
@@ -4104,11 +4240,13 @@ export interface PodStatus {
   conditions?: Array<PodCondition> | null;
   containerStatuses?: Array<ContainerStatus> | null;
   ephemeralContainerStatuses?: Array<ContainerStatus> | null;
+  extendedResourceClaimStatus?: PodExtendedResourceClaimStatus | null;
   hostIP?: string | null;
   hostIPs?: Array<HostIP> | null;
   initContainerStatuses?: Array<ContainerStatus> | null;
   message?: string | null;
   nominatedNodeName?: string | null;
+  observedGeneration?: number | null;
   phase?: string | null;
   podIP?: string | null;
   podIPs?: Array<PodIP> | null;
@@ -4124,11 +4262,13 @@ export function toPodStatus(input: c.JSONValue): PodStatus {
     conditions: c.readOpt(obj["conditions"], x => c.readList(x, toPodCondition)),
     containerStatuses: c.readOpt(obj["containerStatuses"], x => c.readList(x, toContainerStatus)),
     ephemeralContainerStatuses: c.readOpt(obj["ephemeralContainerStatuses"], x => c.readList(x, toContainerStatus)),
+    extendedResourceClaimStatus: c.readOpt(obj["extendedResourceClaimStatus"], toPodExtendedResourceClaimStatus),
     hostIP: c.readOpt(obj["hostIP"], c.checkStr),
     hostIPs: c.readOpt(obj["hostIPs"], x => c.readList(x, toHostIP)),
     initContainerStatuses: c.readOpt(obj["initContainerStatuses"], x => c.readList(x, toContainerStatus)),
     message: c.readOpt(obj["message"], c.checkStr),
     nominatedNodeName: c.readOpt(obj["nominatedNodeName"], c.checkStr),
+    observedGeneration: c.readOpt(obj["observedGeneration"], c.checkNum),
     phase: c.readOpt(obj["phase"], c.checkStr),
     podIP: c.readOpt(obj["podIP"], c.checkStr),
     podIPs: c.readOpt(obj["podIPs"], x => c.readList(x, toPodIP)),
@@ -4144,6 +4284,7 @@ export function fromPodStatus(input: PodStatus): c.JSONValue {
     conditions: input.conditions?.map(fromPodCondition),
     containerStatuses: input.containerStatuses?.map(fromContainerStatus),
     ephemeralContainerStatuses: input.ephemeralContainerStatuses?.map(fromContainerStatus),
+    extendedResourceClaimStatus: input.extendedResourceClaimStatus != null ? fromPodExtendedResourceClaimStatus(input.extendedResourceClaimStatus) : undefined,
     hostIPs: input.hostIPs?.map(fromHostIP),
     initContainerStatuses: input.initContainerStatuses?.map(fromContainerStatus),
     podIPs: input.podIPs?.map(fromPodIP),
@@ -4156,6 +4297,7 @@ export interface PodCondition {
   lastProbeTime?: c.Time | null;
   lastTransitionTime?: c.Time | null;
   message?: string | null;
+  observedGeneration?: number | null;
   reason?: string | null;
   status: string;
   type: string;
@@ -4166,6 +4308,7 @@ export function toPodCondition(input: c.JSONValue): PodCondition {
     lastProbeTime: c.readOpt(obj["lastProbeTime"], c.toTime),
     lastTransitionTime: c.readOpt(obj["lastTransitionTime"], c.toTime),
     message: c.readOpt(obj["message"], c.checkStr),
+    observedGeneration: c.readOpt(obj["observedGeneration"], c.checkNum),
     reason: c.readOpt(obj["reason"], c.checkStr),
     status: c.checkStr(obj["status"]),
     type: c.checkStr(obj["type"]),
@@ -4175,6 +4318,23 @@ export function fromPodCondition(input: PodCondition): c.JSONValue {
     ...input,
     lastProbeTime: input.lastProbeTime != null ? c.fromTime(input.lastProbeTime) : undefined,
     lastTransitionTime: input.lastTransitionTime != null ? c.fromTime(input.lastTransitionTime) : undefined,
+  }}
+
+/** PodExtendedResourceClaimStatus is stored in the PodStatus for the extended resource requests backed by DRA. It stores the generated name for the corresponding special ResourceClaim created by the scheduler. */
+export interface PodExtendedResourceClaimStatus {
+  requestMappings: Array<ContainerExtendedResourceRequest>;
+  resourceClaimName: string;
+}
+export function toPodExtendedResourceClaimStatus(input: c.JSONValue): PodExtendedResourceClaimStatus {
+  const obj = c.checkObj(input);
+  return {
+    requestMappings: c.readList(obj["requestMappings"], toContainerExtendedResourceRequest),
+    resourceClaimName: c.checkStr(obj["resourceClaimName"]),
+  }}
+export function fromPodExtendedResourceClaimStatus(input: PodExtendedResourceClaimStatus): c.JSONValue {
+  return {
+    ...input,
+    requestMappings: input.requestMappings?.map(fromContainerExtendedResourceRequest),
   }}
 
 /** PodIP represents a single IP address allocated to the pod. */

@@ -7,7 +7,8 @@ type ListOf<T> = {
   items: Array<T>;
 };
 
-/** VerticalPodAutoscalerCheckpoint is the checkpoint of the internal state of VPA that is used for recovery after recommender's restart. */
+/** VerticalPodAutoscalerCheckpoint is the checkpoint of the internal state of VPA that
+is used for recovery after recommender's restart. */
 export interface VerticalPodAutoscalerCheckpoint {
   apiVersion?: "autoscaling.k8s.io/v1";
   kind?: "VerticalPodAutoscalerCheckpoint";
@@ -106,7 +107,9 @@ export function toVerticalPodAutoscalerCheckpointList(input: c.JSONValue): Verti
     items: c.readList(obj.items, toVerticalPodAutoscalerCheckpoint),
   }}
 
-/** VerticalPodAutoscaler is the configuration for a vertical pod autoscaler, which automatically manages pod resources based on historical and real time resource utilization. */
+/** VerticalPodAutoscaler is the configuration for a vertical pod
+autoscaler, which automatically manages pod resources based on historical and
+real time resource utilization. */
 export interface VerticalPodAutoscaler {
   apiVersion?: "autoscaling.k8s.io/v1";
   kind?: "VerticalPodAutoscaler";
@@ -136,7 +139,7 @@ export interface VerticalPodAutoscaler {
         resources: Array<string>;
       }> | null;
       minReplicas?: number | null;
-      updateMode?: "Off" | "Initial" | "Recreate" | "Auto" | c.UnexpectedEnumValue | null;
+      updateMode?: "Off" | "Initial" | "Recreate" | "InPlaceOrRecreate" | "Auto" | c.UnexpectedEnumValue | null;
     } | null;
   };
   status?: {
@@ -215,7 +218,7 @@ function toVerticalPodAutoscaler_spec_updatePolicy(input: c.JSONValue) {
   return {
     evictionRequirements: c.readOpt(obj["evictionRequirements"], x => c.readList(x, toVerticalPodAutoscaler_spec_updatePolicy_evictionRequirements)),
     minReplicas: c.readOpt(obj["minReplicas"], c.checkNum),
-    updateMode: c.readOpt(obj["updateMode"], (x => c.readEnum<"Off" | "Initial" | "Recreate" | "Auto" | c.UnexpectedEnumValue>(x))),
+    updateMode: c.readOpt(obj["updateMode"], (x => c.readEnum<"Off" | "Initial" | "Recreate" | "InPlaceOrRecreate" | "Auto" | c.UnexpectedEnumValue>(x))),
   }}
 function toVerticalPodAutoscaler_status_conditions(input: c.JSONValue) {
   const obj = c.checkObj(input);

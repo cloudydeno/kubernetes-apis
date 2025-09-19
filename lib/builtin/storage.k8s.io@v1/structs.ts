@@ -34,6 +34,7 @@ export function fromCSIDriver(input: CSIDriver): c.JSONValue {
 export interface CSIDriverSpec {
   attachRequired?: boolean | null;
   fsGroupPolicy?: string | null;
+  nodeAllocatableUpdatePeriodSeconds?: number | null;
   podInfoOnMount?: boolean | null;
   requiresRepublish?: boolean | null;
   seLinuxMount?: boolean | null;
@@ -46,6 +47,7 @@ export function toCSIDriverSpec(input: c.JSONValue): CSIDriverSpec {
   return {
     attachRequired: c.readOpt(obj["attachRequired"], c.checkBool),
     fsGroupPolicy: c.readOpt(obj["fsGroupPolicy"], c.checkStr),
+    nodeAllocatableUpdatePeriodSeconds: c.readOpt(obj["nodeAllocatableUpdatePeriodSeconds"], c.checkNum),
     podInfoOnMount: c.readOpt(obj["podInfoOnMount"], c.checkBool),
     requiresRepublish: c.readOpt(obj["requiresRepublish"], c.checkBool),
     seLinuxMount: c.readOpt(obj["seLinuxMount"], c.checkBool),
@@ -360,12 +362,14 @@ export function fromVolumeAttachmentStatus(input: VolumeAttachmentStatus): c.JSO
 
 /** VolumeError captures an error encountered during a volume operation. */
 export interface VolumeError {
+  errorCode?: number | null;
   message?: string | null;
   time?: c.Time | null;
 }
 export function toVolumeError(input: c.JSONValue): VolumeError {
   const obj = c.checkObj(input);
   return {
+    errorCode: c.readOpt(obj["errorCode"], c.checkNum),
     message: c.readOpt(obj["message"], c.checkStr),
     time: c.readOpt(obj["time"], c.toTime),
   }}
@@ -386,4 +390,40 @@ export function toVolumeAttachmentList(input: c.JSONValue): VolumeAttachmentList
     ...c.assertOrAddApiVersionAndKind(obj, "storage.k8s.io/v1", "VolumeAttachmentList"),
     metadata: MetaV1.toListMeta(obj.metadata),
     items: c.readList(obj.items, toVolumeAttachment),
+  }}
+
+/** VolumeAttributesClass represents a specification of mutable volume attributes defined by the CSI driver. The class can be specified during dynamic provisioning of PersistentVolumeClaims, and changed in the PersistentVolumeClaim spec after provisioning. */
+export interface VolumeAttributesClass {
+  apiVersion?: "storage.k8s.io/v1";
+  kind?: "VolumeAttributesClass";
+  driverName: string;
+  metadata?: MetaV1.ObjectMeta | null;
+  parameters?: Record<string,string> | null;
+}
+export function toVolumeAttributesClass(input: c.JSONValue): VolumeAttributesClass & c.ApiKind {
+  const obj = c.checkObj(input);
+  return {
+    ...c.assertOrAddApiVersionAndKind(obj, "storage.k8s.io/v1", "VolumeAttributesClass"),
+    driverName: c.checkStr(obj["driverName"]),
+    metadata: c.readOpt(obj["metadata"], MetaV1.toObjectMeta),
+    parameters: c.readOpt(obj["parameters"], x => c.readMap(x, c.checkStr)),
+  }}
+export function fromVolumeAttributesClass(input: VolumeAttributesClass): c.JSONValue {
+  return {
+    ...c.assertOrAddApiVersionAndKind(input, "storage.k8s.io/v1", "VolumeAttributesClass"),
+    ...input,
+    metadata: input.metadata != null ? MetaV1.fromObjectMeta(input.metadata) : undefined,
+  }}
+
+/** VolumeAttributesClassList is a collection of VolumeAttributesClass objects. */
+export interface VolumeAttributesClassList extends ListOf<VolumeAttributesClass> {
+  apiVersion?: "storage.k8s.io/v1";
+  kind?: "VolumeAttributesClassList";
+};
+export function toVolumeAttributesClassList(input: c.JSONValue): VolumeAttributesClassList & c.ApiKind {
+  const obj = c.checkObj(input);
+  return {
+    ...c.assertOrAddApiVersionAndKind(obj, "storage.k8s.io/v1", "VolumeAttributesClassList"),
+    metadata: MetaV1.toListMeta(obj.metadata),
+    items: c.readList(obj.items, toVolumeAttributesClass),
   }}

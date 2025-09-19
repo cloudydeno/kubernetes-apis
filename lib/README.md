@@ -1,6 +1,6 @@
-![Deno CI](https://github.com/danopia/deno-kubernetes_apis/workflows/CI/badge.svg?branch=main)
+[![CI](https://github.com/cloudydeno/kubernetes-apis/actions/workflows/deno-ci.yaml/badge.svg)](https://github.com/cloudydeno/kubernetes-apis/actions/workflows/deno-ci.yaml)
 
-# `/x/kubernetes_apis`
+# `@cloudydeno/kubernetes-apis`
 
 ## Purpose
 
@@ -44,9 +44,19 @@ for more information.
 
 ## Changelog
 
+* `v0.6.0` on `2025-09-20`:
+  * Includes 'builtin' APIs generated from K8s `v1.34.1`.
+    * New APIs:
+      * `certificates.k8s.io/v1beta1` with kind `ClusterTrustBundle`
+      * `coordination.k8s.io/v1beta1` with kind `LeaseCandidate`
+      * `resource.k8s.io/v1` with `DeviceClass`, `ResourceSlice`, `ResourceClaim`, etc
+    * Other new kinds include `PodCertificateRequest`, `IPAddress`, and `VolumeAttributesClass`
+    * Removed API versions: (BREAKING)
+      * `authentication.k8s.io/v1beta1` ⚠ migrate to `authentication.k8s.io/v1`
+  * `argo-cd`, `cert-manager`, and `vpa` CRDs have been updated to latest.
+
 * `v0.5.5` on `2025-09-19`:
   * Fully adopt JSR. Remove remnants of `/x/` and `/std/` dependencies.
-  *
 
 * `v0.5.4` on `2025-01-18`:
   * Includes 'builtin' APIs generated from K8s `v1.32.0`.
