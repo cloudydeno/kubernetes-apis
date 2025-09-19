@@ -44,11 +44,16 @@ for more information.
 
 ## Changelog
 
-* `v0.5.6` on `2025-09-20`:
+* `v0.6.0` on `2025-09-20`:
   * Includes 'builtin' APIs generated from K8s `v1.34.1`.
-    * Several API versions were changed, removed, or added.
-    * You may need to update imports if you used a non-stable API version which has been moved.
-  * `cert-manager` and `argo-cd` CRDs have been updated.
+    * New APIs:
+      * `certificates.k8s.io/v1beta1` with kind `ClusterTrustBundle`
+      * `coordination.k8s.io/v1beta1` with kind `LeaseCandidate`
+      * `resource.k8s.io/v1` with `DeviceClass`, `ResourceSlice`, `ResourceClaim`, etc
+    * Other new kinds include `PodCertificateRequest`, `IPAddress`, and `VolumeAttributesClass`
+    * Removed API versions: (BREAKING)
+      * `authentication.k8s.io/v1beta1` ⚠ migrate to `authentication.k8s.io/v1`
+  * `argo-cd`, `cert-manager`, and `vpa` CRDs have been updated to latest.
 
 * `v0.5.5` on `2025-09-19`:
   * Fully adopt JSR. Remove remnants of `/x/` and `/std/` dependencies.
