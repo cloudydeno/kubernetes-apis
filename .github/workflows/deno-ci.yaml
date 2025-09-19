@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request: {}
 
+permissions:
+  contents: read
 jobs:
 
   check:
@@ -13,10 +15,12 @@ jobs:
     strategy:
       matrix:
         deno-version:
-        - v1.41
-        - v1.43
-        - v1.45
         - v2.0
+        - v2.1
+        - v2.2
+        - v2.3
+        - v2.4
+        - v2.5
         - canary
       fail-fast: false # run each branch to completion
 
@@ -29,14 +33,11 @@ jobs:
       with:
         deno-version: ${{ matrix.deno-version }}
 
-    # "https" cache: code from the Internet
-    # External sources won't change much so we use less precise keys
-    - name: Cache https://
+    - name: Cache Deno deps
       uses: actions/cache@v4
       with:
-        path: ~/.cache/deno/deps/https
-        key: deno-https/v1-${{ github.sha }}
-        restore-keys: deno-https/v1-
+        path: ~/.cache/deno
+        key: denodir/${{ matrix.deno-version }}-${{ hashFiles('deno.lock') }}
 
     - name: Check generation/mod.ts
       run: time deno check generation/mod.ts
@@ -53,7 +54,7 @@ jobs:
     - name: Test
       run: time deno test
 
-  audit-lib:
+  check-publish-lib:
     runs-on: ubuntu-latest
     name: Audit ./lib
 
@@ -64,6 +65,37 @@ jobs:
     - name: Use latest Deno
       uses: denoland/setup-deno@v2
 
+    - name: Cache Deno deps
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/deno
+        key: denodir-${{ hashFiles('deno.lock') }}
+
     - name: Check publish rules
       working-directory: lib
-      run: ../with-jsr-deps.sh deno publish --dry-run --allow-dirty
+      run: deno publish --dry-run --allow-dirty
+
+  publish-lib:
+    runs-on: ubuntu-latest
+    name: Publish ./lib
+    needs:
+    - check
+    - check-publish-lib
+    if: github.event_name == 'push'
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - uses: denoland/setup-deno@v2
+    - uses: actions/checkout@v5
+
+    - name: Cache Deno deps
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/deno
+        key: denodir-${{ hashFiles('deno.lock') }}
+
+    - name: Publish now
+      run: deno publish

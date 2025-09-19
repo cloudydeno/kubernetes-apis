@@ -1,6 +1,9 @@
 {
   "name": "@cloudydeno/kubernetes-apis",
-  "version": "0.5.2",
+  "version": "0.5.5",
+  "imports": {
+    "@cloudydeno/kubernetes-client": "jsr:@cloudydeno/kubernetes-client@^0.7"
+  },
   "exports": {
 
     "./admissionregistration.k8s.io/v1": "./builtin/admissionregistration.k8s.io@v1/mod.ts",

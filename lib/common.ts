@@ -3,20 +3,20 @@
 //   while users are free to pass in a different compatible client to actually call
 
 import { toStatus, type Status } from "./builtin/meta@v1/structs.ts";
-import {
+import type {
   ApiKind,
   JSONObject,
   JSONValue,
   RequestOptions,
-  type WatchEvent
-} from "./deps.ts";
+  WatchEvent
+} from "@cloudydeno/kubernetes-client";
 export {
   type ApiKind,
   type JSONValue,
   type RestClient,
   WatchEventTransformer,
   type WatchEvent,
-} from "./deps.ts";
+} from "@cloudydeno/kubernetes-client";
 
 // Shorthand for generated type signatures
 export type WatchEventStream<T> = ReadableStream<WatchEvent<T & ApiKind, Status & ApiKind>>;

@@ -1,4 +1,6 @@
-import { YAML, ApiKind, JSONValue } from "./deps.ts";
+import { parseAll as parseAllYAML } from "@std/yaml/parse";
+import type { ApiKind, JSONValue } from "@cloudydeno/kubernetes-client/lib/contract.ts";
+
 import type { OpenAPI2SchemaObject, OpenAPI2Methods, OpenAPI2PathMethod } from './openapi.ts';
 import { writeApiModule } from "./codegen.ts";
 import { SurfaceMap, SurfaceApi, OpScope } from "./describe-surface.ts";
@@ -22,7 +24,7 @@ for await (const dirEntry of Deno.readDir(Deno.args[0])) {
   if (dirEntry.name.endsWith('.example.yaml')) continue;
 
   const raw = await Deno.readFile(Deno.args[0]+'/'+dirEntry.name);
-  const docs = YAML.parseAll(new TextDecoder('utf-8').decode(raw)) as Array<unknown>;
+  const docs = parseAllYAML(new TextDecoder('utf-8').decode(raw)) as Array<unknown>;
   for (const doc of docs) {
 
     const typing = doc as ApiKind;
