@@ -6,7 +6,7 @@
 
 Generated, typed interfaces to make every possible Kubernetes API request and work with richer data structures.
 
-The actual request transports are implemented in `/x/kubernetes_client`.
+The actual HTTP request logic (e.g. authentication) is handled by `@cloudydeno/kubernetes-client`.
 
 ## Usage
 
@@ -15,7 +15,7 @@ The actual request transports are implemented in `/x/kubernetes_client`.
 > import the particular Kubernetes API groups that you want to work with.
 > This arrangement keeps program size smaller.
 
-Here's a basic request, listing all Pods in the `default` namespace.
+This basic example lists all Pods in the `default` namespace.
 It uses the `autoDetectClient()` entrypoint which returns the first usable client.
 
 ```ts
@@ -31,11 +31,22 @@ console.log(podList);
 // see files in examples/ for more API demos (watching, creation, etc)
 ```
 
-When running locally (with `kubectl` set up), you probably just to add `--allow-run=kubectl` to run this.
-For a container being deployed onto a cluster, there's more flags to provide instead;
-see `@cloudydeno/kubernetes-client` docs for more information.
+### Deno Permissions
+
+When running locally (with `kubectl` set up), you probably want to pass `--allow-run=kubectl` to Deno.
+
+For a container being deployed onto a cluster with a Service Account,
+the minimally required Deno permission flags are:
+`--allow-read=/var/run/secrets/kubernetes.io --allow-net=kubernetes.default.svc.cluster.local`
+
+See [`@cloudydeno/kubernetes-client` docs](https://jsr.io/@cloudydeno/kubernetes-client)
+for more information.
 
 ## Changelog
+
+* `v0.5.5` on `2025-09-19`:
+  * Fully adopt JSR. Remove remnants of `/x/` and `/std/` dependencies.
+  *
 
 * `v0.5.4` on `2025-01-18`:
   * Includes 'builtin' APIs generated from K8s `v1.32.0`.

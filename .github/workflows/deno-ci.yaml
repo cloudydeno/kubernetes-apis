@@ -39,6 +39,9 @@ jobs:
         path: ~/.cache/deno
         key: denodir/${{ matrix.deno-version }}-${{ hashFiles('deno.lock') }}
 
+    - name: Possibly reset lockfile
+      run: deno install || rm deno.lock
+
     - name: Check generation/mod.ts
       run: time deno check generation/mod.ts
 
