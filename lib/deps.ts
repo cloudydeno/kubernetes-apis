@@ -1,4 +1,4 @@
-// This file is just the entire matching kubernetes_client version.
+// This file is just the entire matching kubernetes-client version.
 // kubernetes-apis itself only depends on specific files,
 // so this is provided an optional utility.
 

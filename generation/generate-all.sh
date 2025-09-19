@@ -12,5 +12,8 @@
 # https://github.com/kubernetes-sigs/external-dns/releases
 ./generation/sources/external-dns.sh v0.19.0
 
+# https://github.com/fluxcd/flux2/releases
+#./generation/sources/flux-cd.sh v2.6.4
+
 # https://github.com/kubernetes/autoscaler/releases?q=vertical
 ./generation/sources/vpa.sh 1.4.1
