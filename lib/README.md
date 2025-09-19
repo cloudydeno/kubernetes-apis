@@ -1,6 +1,6 @@
-![Deno CI](https://github.com/danopia/deno-kubernetes_apis/workflows/CI/badge.svg?branch=main)
+[![CI](https://github.com/cloudydeno/kubernetes-apis/actions/workflows/deno-ci.yaml/badge.svg)](https://github.com/cloudydeno/kubernetes-apis/actions/workflows/deno-ci.yaml)
 
-# `/x/kubernetes_apis`
+# `@cloudydeno/kubernetes-apis`
 
 ## Purpose
 
@@ -44,9 +44,14 @@ for more information.
 
 ## Changelog
 
+* `v0.5.6` on `2025-09-20`:
+  * Includes 'builtin' APIs generated from K8s `v1.34.1`.
+    * Several API versions were changed, removed, or added.
+    * You may need to update imports if you used a non-stable API version which has been moved.
+  * `cert-manager` and `argo-cd` CRDs have been updated.
+
 * `v0.5.5` on `2025-09-19`:
   * Fully adopt JSR. Remove remnants of `/x/` and `/std/` dependencies.
-  *
 
 * `v0.5.4` on `2025-01-18`:
   * Includes 'builtin' APIs generated from K8s `v1.32.0`.
