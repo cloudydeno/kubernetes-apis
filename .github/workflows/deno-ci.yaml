@@ -26,7 +26,7 @@ jobs:
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Use Deno ${{ matrix.deno-version }}
       uses: denoland/setup-deno@v2
@@ -63,7 +63,7 @@ jobs:
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Use latest Deno
       uses: denoland/setup-deno@v2
@@ -92,7 +92,7 @@ jobs:
 
     steps:
     - uses: denoland/setup-deno@v2
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Cache Deno deps
       uses: actions/cache@v4
