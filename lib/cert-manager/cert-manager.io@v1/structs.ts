@@ -714,6 +714,7 @@ export interface SolverSpec {
     } | null;
     rfc2136?: {
       nameserver: string;
+      protocol?: "TCP" | "UDP" | c.UnexpectedEnumValue | null;
       tsigAlgorithm?: string | null;
       tsigKeyName?: string | null;
       tsigSecretSecretRef?: SecretRef | null;
@@ -763,6 +764,10 @@ export interface SolverSpec {
           }> | null;
           nodeSelector?: Record<string,string> | null;
           priorityClassName?: string | null;
+          resources?: {
+            limits?: Record<string,c.IntOrString> | null;
+            requests?: Record<string,c.IntOrString> | null;
+          } | null;
           securityContext?: {
             fsGroup?: number | null;
             fsGroupChangePolicy?: string | null;
@@ -819,6 +824,10 @@ export interface SolverSpec {
           }> | null;
           nodeSelector?: Record<string,string> | null;
           priorityClassName?: string | null;
+          resources?: {
+            limits?: Record<string,c.IntOrString> | null;
+            requests?: Record<string,c.IntOrString> | null;
+          } | null;
           securityContext?: {
             fsGroup?: number | null;
             fsGroupChangePolicy?: string | null;
@@ -1009,6 +1018,7 @@ function toSolverSpec_dns01_rfc2136(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
     nameserver: c.checkStr(obj["nameserver"]),
+    protocol: c.readOpt(obj["protocol"], (x => c.readEnum<"TCP" | "UDP" | c.UnexpectedEnumValue>(x))),
     tsigAlgorithm: c.readOpt(obj["tsigAlgorithm"], c.checkStr),
     tsigKeyName: c.readOpt(obj["tsigKeyName"], c.checkStr),
     tsigSecretSecretRef: c.readOpt(obj["tsigSecretSecretRef"], toSecretRef),
@@ -1106,6 +1116,7 @@ function toSolverSpec_http01_gatewayHTTPRoute_podTemplate_spec(input: c.JSONValu
     imagePullSecrets: c.readOpt(obj["imagePullSecrets"], x => c.readList(x, toSolverSpec_http01_gatewayHTTPRoute_podTemplate_spec_imagePullSecrets)),
     nodeSelector: c.readOpt(obj["nodeSelector"], x => c.readMap(x, c.checkStr)),
     priorityClassName: c.readOpt(obj["priorityClassName"], c.checkStr),
+    resources: c.readOpt(obj["resources"], toSolverSpec_http01_gatewayHTTPRoute_podTemplate_spec_resources),
     securityContext: c.readOpt(obj["securityContext"], toSolverSpec_http01_gatewayHTTPRoute_podTemplate_spec_securityContext),
     serviceAccountName: c.readOpt(obj["serviceAccountName"], c.checkStr),
     tolerations: c.readOpt(obj["tolerations"], x => c.readList(x, toSolverSpec_http01_gatewayHTTPRoute_podTemplate_spec_tolerations)),
@@ -1129,6 +1140,7 @@ function toSolverSpec_http01_ingress_podTemplate_spec(input: c.JSONValue) {
     imagePullSecrets: c.readOpt(obj["imagePullSecrets"], x => c.readList(x, toSolverSpec_http01_ingress_podTemplate_spec_imagePullSecrets)),
     nodeSelector: c.readOpt(obj["nodeSelector"], x => c.readMap(x, c.checkStr)),
     priorityClassName: c.readOpt(obj["priorityClassName"], c.checkStr),
+    resources: c.readOpt(obj["resources"], toSolverSpec_http01_ingress_podTemplate_spec_resources),
     securityContext: c.readOpt(obj["securityContext"], toSolverSpec_http01_ingress_podTemplate_spec_securityContext),
     serviceAccountName: c.readOpt(obj["serviceAccountName"], c.checkStr),
     tolerations: c.readOpt(obj["tolerations"], x => c.readList(x, toSolverSpec_http01_ingress_podTemplate_spec_tolerations)),
@@ -1143,6 +1155,12 @@ function toSolverSpec_http01_gatewayHTTPRoute_podTemplate_spec_imagePullSecrets(
   const obj = c.checkObj(input);
   return {
     name: c.readOpt(obj["name"], c.checkStr),
+  }}
+function toSolverSpec_http01_gatewayHTTPRoute_podTemplate_spec_resources(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    limits: c.readOpt(obj["limits"], x => c.readMap(x, c.toIntOrString)),
+    requests: c.readOpt(obj["requests"], x => c.readMap(x, c.toIntOrString)),
   }}
 function toSolverSpec_http01_gatewayHTTPRoute_podTemplate_spec_securityContext(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -1170,6 +1188,12 @@ function toSolverSpec_http01_ingress_podTemplate_spec_imagePullSecrets(input: c.
   const obj = c.checkObj(input);
   return {
     name: c.readOpt(obj["name"], c.checkStr),
+  }}
+function toSolverSpec_http01_ingress_podTemplate_spec_resources(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    limits: c.readOpt(obj["limits"], x => c.readMap(x, c.toIntOrString)),
+    requests: c.readOpt(obj["requests"], x => c.readMap(x, c.toIntOrString)),
   }}
 function toSolverSpec_http01_ingress_podTemplate_spec_securityContext(input: c.JSONValue) {
   const obj = c.checkObj(input);

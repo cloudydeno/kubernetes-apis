@@ -44,6 +44,15 @@ for more information.
 
 ## Changelog
 
+* `v0.7.0` on `2025-12-04`:
+  * Update `@cloudydeno/kubernetes-client` dependency to latest (`v0.8.0`)
+    * Breaking Change! Because tunnels were reimplemented, the client's type signature
+      changed and aren't compatible between `v0.7` and `v0.8`.
+      In this case you must update these libraries together for Typescript to be happy.
+    * Tunnel APIs (Pod Exec, Attach, PortForward) now work by default when using Deno 2.5.2 or later.
+  * Regenerate from latest upstream CRDs.
+    * Only includes a couple new fields in `argo-cd` and `cert-manager` CRDs.
+
 * `v0.6.0` on `2025-09-20`:
   * Includes 'builtin' APIs generated from K8s `v1.34.1`.
     * New APIs:

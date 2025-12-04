@@ -1,7 +1,7 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@cloudydeno/kubernetes-client@0.7": "0.7.7",
+    "jsr:@cloudydeno/kubernetes-client@0.8": "0.8.0",
     "jsr:@cloudydeno/stream-observables@1": "1.4.1",
     "jsr:@std/internal@^1.0.10": "1.0.10",
     "jsr:@std/path@1": "1.1.2",
@@ -9,10 +9,9 @@
     "jsr:@std/yaml@1": "1.0.9"
   },
   "jsr": {
-    "@cloudydeno/kubernetes-client@0.7.7": {
-      "integrity": "631ad5d265b03936cf169860bbe3595e336c1e4730ab9bb9d2fe6f7e7fd095ee",
+    "@cloudydeno/kubernetes-client@0.8.0": {
+      "integrity": "08066abfc8f7bb17f6a81f727af1d609dc19a11b14a6c941a52bf11f7a6aea36",
       "dependencies": [
-        "jsr:@cloudydeno/stream-observables",
         "jsr:@std/path",
         "jsr:@std/streams",
         "jsr:@std/yaml"
@@ -72,14 +71,14 @@
     "members": {
       "generation": {
         "dependencies": [
-          "jsr:@cloudydeno/kubernetes-client@0.7",
+          "jsr:@cloudydeno/kubernetes-client@0.8",
           "jsr:@std/path@1",
           "jsr:@std/yaml@1"
         ]
       },
       "lib": {
         "dependencies": [
-          "jsr:@cloudydeno/kubernetes-client@0.7"
+          "jsr:@cloudydeno/kubernetes-client@0.8"
         ]
       }
     }

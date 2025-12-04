@@ -277,6 +277,7 @@ export interface Application {
         maxDuration?: string | null;
       } | null;
       limit?: number | null;
+      refresh?: boolean | null;
     } | null;
     sync?: {
       autoHealAttemptsCount?: number | null;
@@ -359,6 +360,7 @@ export interface Application {
           maxDuration?: string | null;
         } | null;
         limit?: number | null;
+        refresh?: boolean | null;
       } | null;
       syncOptions?: Array<string> | null;
     } | null;
@@ -408,6 +410,7 @@ export interface Application {
             maxDuration?: string | null;
           } | null;
           limit?: number | null;
+          refresh?: boolean | null;
         } | null;
         sync?: {
           autoHealAttemptsCount?: number | null;
@@ -699,6 +702,7 @@ function toApplication_operation_retry(input: c.JSONValue) {
   return {
     backoff: c.readOpt(obj["backoff"], toApplication_operation_retry_backoff),
     limit: c.readOpt(obj["limit"], c.checkNum),
+    refresh: c.readOpt(obj["refresh"], c.checkBool),
   }}
 function toApplication_operation_sync(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -884,6 +888,7 @@ function toApplication_spec_syncPolicy_retry(input: c.JSONValue) {
   return {
     backoff: c.readOpt(obj["backoff"], toApplication_spec_syncPolicy_retry_backoff),
     limit: c.readOpt(obj["limit"], c.checkNum),
+    refresh: c.readOpt(obj["refresh"], c.checkBool),
   }}
 function toApplication_status_history_initiatedBy(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -976,6 +981,7 @@ function toApplication_status_operationState_operation_retry(input: c.JSONValue)
   return {
     backoff: c.readOpt(obj["backoff"], toApplication_status_operationState_operation_retry_backoff),
     limit: c.readOpt(obj["limit"], c.checkNum),
+    refresh: c.readOpt(obj["refresh"], c.checkBool),
   }}
 function toApplication_status_operationState_operation_sync(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -1234,9 +1240,11 @@ export interface ApplicationSetGenerator {
       project: string;
       repo: string;
     } | null;
+    continueOnRepoNotFoundError?: boolean | null;
     filters?: Array<{
       branchMatch?: string | null;
       targetBranchMatch?: string | null;
+      titleMatch?: string | null;
     }> | null;
     gitea?: {
       api: string;
@@ -1506,6 +1514,7 @@ function toApplicationSetGenerator_pullRequest(input: c.JSONValue) {
     azuredevops: c.readOpt(obj["azuredevops"], toApplicationSetGenerator_pullRequest_azuredevops),
     bitbucket: c.readOpt(obj["bitbucket"], toApplicationSetGenerator_pullRequest_bitbucket),
     bitbucketServer: c.readOpt(obj["bitbucketServer"], toApplicationSetGenerator_pullRequest_bitbucketServer),
+    continueOnRepoNotFoundError: c.readOpt(obj["continueOnRepoNotFoundError"], c.checkBool),
     filters: c.readOpt(obj["filters"], x => c.readList(x, toApplicationSetGenerator_pullRequest_filters)),
     gitea: c.readOpt(obj["gitea"], toApplicationSetGenerator_pullRequest_gitea),
     github: c.readOpt(obj["github"], toApplicationSetGenerator_pullRequest_github),
@@ -1587,6 +1596,7 @@ function toApplicationSetGenerator_pullRequest_filters(input: c.JSONValue) {
   return {
     branchMatch: c.readOpt(obj["branchMatch"], c.checkStr),
     targetBranchMatch: c.readOpt(obj["targetBranchMatch"], c.checkStr),
+    titleMatch: c.readOpt(obj["titleMatch"], c.checkStr),
   }}
 function toApplicationSetGenerator_pullRequest_gitea(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -1912,6 +1922,7 @@ export interface ApplicationTemplate {
           maxDuration?: string | null;
         } | null;
         limit?: number | null;
+        refresh?: boolean | null;
       } | null;
       syncOptions?: Array<string> | null;
     } | null;
@@ -2030,6 +2041,7 @@ function toApplicationTemplate_spec_syncPolicy_retry(input: c.JSONValue) {
   return {
     backoff: c.readOpt(obj["backoff"], toApplicationTemplate_spec_syncPolicy_retry_backoff),
     limit: c.readOpt(obj["limit"], c.checkNum),
+    refresh: c.readOpt(obj["refresh"], c.checkBool),
   }}
 function toApplicationTemplate_spec_syncPolicy_retry_backoff(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -2058,6 +2070,7 @@ export interface ApplicationSet {
       labels?: Array<string> | null;
     } | null;
     strategy?: {
+      deletionOrder?: string | null;
       rollingSync?: {
         steps?: Array<{
           matchExpressions?: Array<{
@@ -2110,6 +2123,7 @@ export interface ApplicationSet {
       syncWave?: number | null;
       version?: string | null;
     }> | null;
+    resourcesCount?: number | null;
   } | null;
 }
 export function toApplicationSet(input: c.JSONValue): ApplicationSet & c.ApiKind {
@@ -2169,6 +2183,7 @@ function toApplicationSet_status(input: c.JSONValue) {
     applicationStatus: c.readOpt(obj["applicationStatus"], x => c.readList(x, toApplicationSet_status_applicationStatus)),
     conditions: c.readOpt(obj["conditions"], x => c.readList(x, toApplicationSet_status_conditions)),
     resources: c.readOpt(obj["resources"], x => c.readList(x, toApplicationSet_status_resources)),
+    resourcesCount: c.readOpt(obj["resourcesCount"], c.checkNum),
   }}
 function toApplicationSet_spec_ignoreApplicationDifferences(input: c.JSONValue) {
   const obj = c.checkObj(input);
@@ -2186,6 +2201,7 @@ function toApplicationSet_spec_preservedFields(input: c.JSONValue) {
 function toApplicationSet_spec_strategy(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    deletionOrder: c.readOpt(obj["deletionOrder"], c.checkStr),
     rollingSync: c.readOpt(obj["rollingSync"], toApplicationSet_spec_strategy_rollingSync),
     type: c.readOpt(obj["type"], c.checkStr),
   }}
