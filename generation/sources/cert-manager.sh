@@ -11,7 +11,7 @@ then {
   echo 'mkdir '"$specdir"
   echo 'cd '"$specdir"
   wget -O - "$gitapi/repos/$upstream/contents/$crdpath?ref=$1" \
-  | jq -r '.[] | select(.name | startswith("crd-")) | "wget \(.download_url)"'
+  | jq -r '.[] | select(.name | endswith(".yaml")) | "wget \(.download_url)"'
 } | sh -eux
 fi
 

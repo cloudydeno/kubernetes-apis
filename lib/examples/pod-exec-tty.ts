@@ -1,11 +1,10 @@
 #!/usr/bin/env -S deno run --unstable --allow-env --allow-read --allow-net
 
-import { tunnelBeta, makeClientProviderChain } from '../deps.ts';
+import { autoDetectClient } from '../deps.ts';
 import { CoreV1Api } from '../builtin/core@v1/mod.ts';
 
-// Set up an experimental client which can use Websockets
-const client = await makeClientProviderChain(tunnelBeta.WebsocketRestClient).getClient();
-const coreApi = new CoreV1Api(client);
+const restClient = await autoDetectClient();
+const coreApi = new CoreV1Api(restClient);
 
 // Launch a process into a particular container
 const tunnel = await coreApi

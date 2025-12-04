@@ -3,7 +3,6 @@
 // so this is provided an optional utility.
 
 export * from "@cloudydeno/kubernetes-client";
-export * as tunnelBeta from "@cloudydeno/kubernetes-client/tunnel-beta/via-websocket.ts";
 
 export * from "@cloudydeno/kubernetes-client/lib/contract.ts";
 export {
