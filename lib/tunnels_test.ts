@@ -106,7 +106,7 @@ Deno.test('portforwardtunnel echo pipe', async () => {
     close: () => Promise.resolve(),
     [Symbol.dispose]: () => Promise.resolve(),
     subProtocol: 'v4.tunnel.k8s.io',
-    transportProtocol: 'Opaque',
+    transportProtocol: 'WebSocket', // specifies semantics of tunnelled socket setup
   }, new URLSearchParams([
     ['ports', '80'],
   ]));
@@ -114,7 +114,7 @@ Deno.test('portforwardtunnel echo pipe', async () => {
 
   const intendedText = 'asdf pickel';
 
-  const socket = await tunnel.connectToPort(80);
+  const socket = tunnel.connectToPort(80);
   const [output] = await Promise.all([
     new Response(socket.readable).text(),
     (async () => {

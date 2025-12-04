@@ -30,11 +30,6 @@ export class StdioTunnel {
     private readonly tunnel: KubernetesTunnel,
     originalParams: URLSearchParams,
   ) {
-    if (this.tunnel.subProtocol.startsWith('v')) {
-      this.channelVersion = parseInt(this.tunnel.subProtocol.slice(1));
-    } else {
-      this.channelVersion = 1;
-    }
 
     this.#stdin = originalParams.get('stdin') == '1'
       ? tunnel.getWritableStream({ index: 0, spdyHeaders: { streamType: 'stdin' } })
@@ -50,11 +45,16 @@ export class StdioTunnel {
 
     const errorStream = tunnel.getReadableStream({ index: 3, spdyHeaders: { streamType: 'error' } });
     this.status = new Response(errorStream).text()
+      // Make sure the tunnel is set up all the way so we have channelVersion
+      // Relevant when the tunnel fails immediately (pod not found)
+      .then(async x => { await this.tunnel.whenReady(); return x; })
       .then<ExecStatus>(text => this.channelVersion >= 4
         ? addExitCode(JSON.parse(text))
         : { status: 'Failure', message: text });
 
-    this.#resize = (originalParams.get('tty') == '1' && this.channelVersion >= 3)
+    // At setup time, we don't know yet what protocol version we handshaked
+    // So we set up the stream regardless, and instead check compatibility before writing
+    this.#resize = originalParams.get('tty') == '1'
       ? wrapResizeStream(tunnel.getWritableStream({ index: 4, spdyHeaders: { streamType: 'resize' } }))
       : null;
 
@@ -68,13 +68,22 @@ export class StdioTunnel {
       });
     }
   }
-  readonly channelVersion: number;
   #stdin: WritableStream<Uint8Array> | null = null;
   #stdinWriter: WritableStreamDefaultWriter<Uint8Array> | null = null;
   #stdout: ReadableStream<Uint8Array> | null = null;
   #stderr: ReadableStream<Uint8Array> | null = null;
   #resize: WritableStream<TerminalSize> | null = null;
   status!: Promise<ExecStatus>;
+
+  get channelVersion(): number {
+    if (!this.tunnel.subProtocol) throw new TypeError(
+      `Cannot get channelVersion before Tunnel is ready`)
+    if (this.tunnel.subProtocol.startsWith('v')) {
+      return parseInt(this.tunnel.subProtocol.slice(1));
+    } else {
+      return 1;
+    }
+  }
 
   get ready(): Promise<void> {
     return this.tunnel.whenReady();
@@ -97,6 +106,8 @@ export class StdioTunnel {
   /** If tty was requested, an outbound stream for dynamically changing the TTY dimensions */
   get ttyResizeStream(): WritableStream<TerminalSize> {
     if (!this.#resize) throw new TypeError("tty was not requested");
+    if (this.channelVersion < 3) throw new TypeError(
+      `tty resize is not available with "${this.tunnel.subProtocol}"`);
     return this.#resize;
   }
 
@@ -194,6 +205,12 @@ function addExitCode(status: ExecStatus) {
   return status;
 }
 
+export type ForwardedSocket = {
+  port: number;
+  result: Promise<null>;
+  readable: ReadableStream<Uint8Array>;
+  writable: WritableStream<Uint8Array>;
+};
 
 export class PortforwardTunnel {
   static readonly supportedProtocols = [
@@ -207,10 +224,15 @@ export class PortforwardTunnel {
     private tunnel: KubernetesTunnel,
     originalParams: URLSearchParams,
   ) {
-    if (tunnel.subProtocol !== 'portforward.k8s.io') {
+    // For WebSocket, all sockets are opened upstream immediately, we must set them up now.
+    // This avoids issues with receiving data early
+    // SPDY creates each forwarded socket on-demand, no need to setup in that case.
+    if (tunnel.transportProtocol == 'WebSocket') {
       const requestedPorts = originalParams.getAll('ports').map(x => parseInt(x));
       if (requestedPorts.length > 0) {
-        this.remainingPorts = requestedPorts;
+        // Create all of the requested forwarded-socket interfaces.
+        this.remainingPorts = requestedPorts.map((port, idx) =>
+          this.setupPort({ port, dataIdx: idx*2, errorIdx: idx*2 + 1 }));
       } else {
         tunnel.close();
         throw new Error(`Kubernetes PortForwarding can only use WebSocket with a predefined list of ports. For dynamic multiplexing, try a SPDY client instead.`);
@@ -218,69 +240,75 @@ export class PortforwardTunnel {
     }
   }
   private nextRequestId = 0;
-  private remainingPorts = new Array<number | false>;
+  private remainingPorts: Array<ForwardedSocket> | undefined = undefined;
 
   get ready(): Promise<void> {
     return this.tunnel.whenReady();
   }
 
-  async connectToPort(port: number): Promise<{
-    result: Promise<null>;
-    readable: ReadableStream<Uint8Array>;
-    writable: WritableStream<Uint8Array>;
-  }> {
-    let dataIdx: number | undefined = undefined;
-    let errorIdx: number | undefined = undefined;
-
-    if (this.remainingPorts) {
-      const nextAvailableIdx = this.remainingPorts.findIndex(x => x == port);
-      if (nextAvailableIdx < 0) throw new Error(`No remaining pre-established connections to port ${port}.`);
-      this.remainingPorts[nextAvailableIdx] = false;
-
-      dataIdx = nextAvailableIdx*2;
-      errorIdx = dataIdx + 1;
-    }
-
-    // Used for SPDY only
-    const requestID = this.nextRequestId++;
+  // Connects to a particular upstream port.
+  private setupPort(opts: {
+    port: number;
+    dataIdx?: number;
+    errorIdx?: number;
+    requestID?: number; // Pass to enable SPDY
+  }): ForwardedSocket {
 
     const outboundStream = this.tunnel.getWritableStream({
-      index: dataIdx,
-      spdyHeaders: {
+      index: opts.dataIdx,
+      spdyHeaders: typeof opts.requestID == 'number' ? {
         streamType: 'data',
-        port,
-        requestID,
-      },
+        port: opts.port,
+        requestID: opts.requestID,
+      } : void 0,
     });
 
     const inboundStream = this.tunnel.getReadableStream({
-      index: dataIdx,
-      spdyHeaders: {
+      index: opts.dataIdx,
+      spdyHeaders: typeof opts.requestID == 'number' ? {
         streamType: 'data',
-        port,
-        requestID,
-      },
-    }).pipeThrough(new DropPrefix(port));
+        port: opts.port,
+        requestID: opts.requestID,
+      } : void 0,
+    }).pipeThrough(new DropPrefix(opts.port));
 
     const errorStream = this.tunnel.getReadableStream({
-      index: errorIdx,
-      spdyHeaders: {
+      index: opts.errorIdx,
+      spdyHeaders: typeof opts.requestID == 'number' ? {
         streamType: 'error',
-        port,
-        requestID,
-      },
-    }).pipeThrough(new DropPrefix(port));
+        port: opts.port,
+        requestID: opts.requestID,
+      } : void 0,
+    }).pipeThrough(new DropPrefix(opts.port));
     const errorBody = new Response(errorStream).text();
 
-    await this.tunnel.whenReady();
-
     return {
+      port: opts.port,
       result: errorBody.then(x => x
         ? Promise.reject(new Error(`Portforward stream failed. ${x}`))
         : null),
       readable: inboundStream,
       writable: outboundStream,
     };
+  }
+
+  connectToPort(port: number): ForwardedSocket {
+
+    // For WebSocket, all requested ports are set-up immediately
+    // So we just return from those instances and bail if none are left.
+    if (this.remainingPorts) {
+      const nextAvailableIdx = this.remainingPorts.findIndex(x => x.port == port);
+      if (nextAvailableIdx < 0) throw new Error(`No remaining pre-established connections to port ${port}.`);
+      const [socket] = this.remainingPorts.splice(nextAvailableIdx, 1);
+      return socket;
+    }
+
+    // Otherwise it looks like we're using SPDY,
+    // so we allocate a request number and dynamically set up a socket
+    return this.setupPort({
+      port,
+      requestID: this.nextRequestId++,
+    });
   }
 
   servePortforward(opts: Deno.ListenOptions & {
