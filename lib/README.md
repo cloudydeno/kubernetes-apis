@@ -49,8 +49,9 @@ for more information.
     * Breaking Change! Because tunnels were reimplemented, the client's type signature
       changed and aren't compatible between `v0.7` and `v0.8`.
       In this case you must update these libraries together for Typescript to be happy.
-    * Tunnel APIs (Pod Exec, Attach, PortForward) now work by default when using Deno 2.5.2 or later.
-  * Regenerate from latest upstream CRDs.
+    * Tunnel APIs (Pod Exec, Attach, PortForward) now work normally when using Deno 2.5.2 or later.
+      * Because the new client uses WebSockets instead of SPDY, PortForward has increased setup latency when tunnelling multiple sockets.
+  * Regenerate APIs from latest upstream CRDs.
     * Only includes a couple new fields in `argo-cd` and `cert-manager` CRDs.
 
 * `v0.6.0` on `2025-09-20`:

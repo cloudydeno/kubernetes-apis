@@ -19,7 +19,7 @@ export type ExecStatus = {
 
 export class StdioTunnel {
   static readonly supportedProtocols = [
-    // proposed v5: adds stdin closing
+    'v5.channel.k8s.io', // v5: adds stdin closing (handled within the WebSocket client)
     'v4.channel.k8s.io', // v4: switches error stream to JSON
     'v3.channel.k8s.io', // v3: adds terminal resizing
     // 'v2.channel.k8s.io',
@@ -36,51 +36,37 @@ export class StdioTunnel {
       this.channelVersion = 1;
     }
 
-    function getWritable(streamIndex: number, streamType: string) {
-      return tunnel.getChannel({
-        streamIndex,
-        spdyHeaders: { streamType },
-        readable: false,
-        writable: true,
-      }).then(x => x.writable);
+    this.#stdin = originalParams.get('stdin') == '1'
+      ? tunnel.getWritableStream({ index: 0, spdyHeaders: { streamType: 'stdin' } })
+      : null;
+
+    this.#stdout = originalParams.get('stdout') == '1'
+      ? tunnel.getReadableStream({ index: 1, spdyHeaders: { streamType: 'stdout' } })
+      : null;
+
+    this.#stderr = originalParams.get('stderr') == '1'
+      ? tunnel.getReadableStream({ index: 2, spdyHeaders: { streamType: 'stderr' } })
+      : null;
+
+    const errorStream = tunnel.getReadableStream({ index: 3, spdyHeaders: { streamType: 'error' } });
+    this.status = new Response(errorStream).text()
+      .then<ExecStatus>(text => this.channelVersion >= 4
+        ? addExitCode(JSON.parse(text))
+        : { status: 'Failure', message: text });
+
+    this.#resize = (originalParams.get('tty') == '1' && this.channelVersion >= 3)
+      ? wrapResizeStream(tunnel.getWritableStream({ index: 4, spdyHeaders: { streamType: 'resize' } }))
+      : null;
+
+    if (this.#stdin && originalParams.get('tty') == '1') {
+      const writer = this.#stdinWriter = this.#stdin.getWriter();
+      // TODO: check if this breaks stdin backpressure
+      this.#stdin = new WritableStream({
+        write(chunk) { return writer.write(chunk); },
+        abort(reason) { return writer.abort(reason); },
+        close() { return writer.close(); },
+      });
     }
-    function getReadable(streamIndex: number, streamType: string) {
-      return tunnel.getChannel({
-        streamIndex,
-        spdyHeaders: { streamType },
-        readable: true,
-        writable: false,
-      }).then(x => x.readable);
-    }
-
-    this.ready = Promise.all([
-      originalParams.get('stdin') == '1' ? getWritable(0, 'stdin') : null,
-      originalParams.get('stdout') == '1' ? getReadable(1, 'stdout') : null,
-      originalParams.get('stderr') == '1' ? getReadable(2, 'stderr') : null,
-      getReadable(3, 'error'),
-      (originalParams.get('tty') == '1' && this.channelVersion >= 3) ? getWritable(4, 'resize') : null,
-    ]).then(streams => {
-      this.#stdin = streams[0];
-      this.#stdout = streams[1];
-      this.#stderr = streams[2];
-      this.status = new Response(streams[3]).text()
-        .then<ExecStatus>(text => this.channelVersion >= 4
-          ? addExitCode(JSON.parse(text))
-          : { status: 'Failure', message: text });
-      this.#resize = streams[4] ? wrapResizeStream(streams[4]) : null;
-
-      if (this.#stdin && originalParams.get('tty') == '1') {
-        const writer = this.#stdinWriter = this.#stdin.getWriter();
-        // TODO: check if this breaks stdin backpressure
-        this.#stdin = new WritableStream({
-          write(chunk) { return writer.write(chunk); },
-          abort(reason) { return writer.abort(reason); },
-          close() { return writer.close(); },
-        });
-      }
-
-      return tunnel.ready();
-    });
   }
   readonly channelVersion: number;
   #stdin: WritableStream<Uint8Array> | null = null;
@@ -89,7 +75,10 @@ export class StdioTunnel {
   #stderr: ReadableStream<Uint8Array> | null = null;
   #resize: WritableStream<TerminalSize> | null = null;
   status!: Promise<ExecStatus>;
-  ready: Promise<void>;
+
+  get ready(): Promise<void> {
+    return this.tunnel.whenReady();
+  }
 
   // Take a cue from Deno.Command which presents the streams unconditionally
   // but throws if they are used when not configured
@@ -168,7 +157,7 @@ export class StdioTunnel {
 
   /** Immediately disconnects the network tunnel, likely dropping any in-flight data. */
   kill(): void {
-    this.tunnel.stop();
+    this.tunnel.close();
   }
 }
 
@@ -223,7 +212,7 @@ export class PortforwardTunnel {
       if (requestedPorts.length > 0) {
         this.remainingPorts = requestedPorts;
       } else {
-        tunnel.stop();
+        tunnel.close();
         throw new Error(`Kubernetes PortForwarding can only use WebSocket with a predefined list of ports. For dynamic multiplexing, try a SPDY client instead.`);
       }
     }
@@ -232,7 +221,7 @@ export class PortforwardTunnel {
   private remainingPorts = new Array<number | false>;
 
   get ready(): Promise<void> {
-    return this.tunnel.ready();
+    return this.tunnel.whenReady();
   }
 
   async connectToPort(port: number): Promise<{
@@ -252,39 +241,45 @@ export class PortforwardTunnel {
       errorIdx = dataIdx + 1;
     }
 
+    // Used for SPDY only
     const requestID = this.nextRequestId++;
-    const [dataStream, errorStream] = await Promise.all([
-      this.tunnel.getChannel({
-        spdyHeaders: {
-          streamType: 'data',
-          port,
-          requestID,
-        },
-        streamIndex: dataIdx,
-        readable: true,
-        writable: true,
-      }),
-      this.tunnel.getChannel({
-        spdyHeaders: {
-          streamType: 'error',
-          port,
-          requestID,
-        },
-        streamIndex: errorIdx,
-        writable: false,
-        readable: true,
-      }),
-    ]);
-    // console.error('Got streams');
 
-    const errorBody = new Response(errorStream.readable.pipeThrough(new DropPrefix(port))).text();
+    const outboundStream = this.tunnel.getWritableStream({
+      index: dataIdx,
+      spdyHeaders: {
+        streamType: 'data',
+        port,
+        requestID,
+      },
+    });
+
+    const inboundStream = this.tunnel.getReadableStream({
+      index: dataIdx,
+      spdyHeaders: {
+        streamType: 'data',
+        port,
+        requestID,
+      },
+    }).pipeThrough(new DropPrefix(port));
+
+    const errorStream = this.tunnel.getReadableStream({
+      index: errorIdx,
+      spdyHeaders: {
+        streamType: 'error',
+        port,
+        requestID,
+      },
+    }).pipeThrough(new DropPrefix(port));
+    const errorBody = new Response(errorStream).text();
+
+    await this.tunnel.whenReady();
 
     return {
       result: errorBody.then(x => x
         ? Promise.reject(new Error(`Portforward stream failed. ${x}`))
         : null),
-      readable: dataStream.readable.pipeThrough(new DropPrefix(port)),
-      writable: dataStream.writable,
+      readable: inboundStream,
+      writable: outboundStream,
     };
   }
 
@@ -310,7 +305,7 @@ export class PortforwardTunnel {
   }
 
   disconnect(): void {
-    this.tunnel.stop();
+    this.tunnel.close();
   }
 }
 
