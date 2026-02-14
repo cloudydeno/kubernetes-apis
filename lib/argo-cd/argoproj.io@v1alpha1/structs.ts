@@ -329,7 +329,98 @@ export interface Application {
     source?: ApplicationSource | null;
     sourceHydrator?: {
       drySource: {
+        directory?: {
+          exclude?: string | null;
+          include?: string | null;
+          jsonnet?: {
+            extVars?: Array<{
+              code?: boolean | null;
+              name: string;
+              value: string;
+            }> | null;
+            libs?: Array<string> | null;
+            tlas?: Array<{
+              code?: boolean | null;
+              name: string;
+              value: string;
+            }> | null;
+          } | null;
+          recurse?: boolean | null;
+        } | null;
+        helm?: {
+          apiVersions?: Array<string> | null;
+          fileParameters?: Array<{
+            name?: string | null;
+            path?: string | null;
+          }> | null;
+          ignoreMissingValueFiles?: boolean | null;
+          kubeVersion?: string | null;
+          namespace?: string | null;
+          parameters?: Array<{
+            forceString?: boolean | null;
+            name?: string | null;
+            value?: string | null;
+          }> | null;
+          passCredentials?: boolean | null;
+          releaseName?: string | null;
+          skipCrds?: boolean | null;
+          skipSchemaValidation?: boolean | null;
+          skipTests?: boolean | null;
+          valueFiles?: Array<string> | null;
+          values?: string | null;
+          valuesObject?: c.JSONValue | null;
+          version?: string | null;
+        } | null;
+        kustomize?: {
+          apiVersions?: Array<string> | null;
+          commonAnnotations?: Record<string,string> | null;
+          commonAnnotationsEnvsubst?: boolean | null;
+          commonLabels?: Record<string,string> | null;
+          components?: Array<string> | null;
+          forceCommonAnnotations?: boolean | null;
+          forceCommonLabels?: boolean | null;
+          ignoreMissingComponents?: boolean | null;
+          images?: Array<string> | null;
+          kubeVersion?: string | null;
+          labelIncludeTemplates?: boolean | null;
+          labelWithoutSelector?: boolean | null;
+          namePrefix?: string | null;
+          nameSuffix?: string | null;
+          namespace?: string | null;
+          patches?: Array<{
+            options?: Record<string,boolean> | null;
+            patch?: string | null;
+            path?: string | null;
+            target?: {
+              annotationSelector?: string | null;
+              group?: string | null;
+              kind?: string | null;
+              labelSelector?: string | null;
+              name?: string | null;
+              namespace?: string | null;
+              version?: string | null;
+            } | null;
+          }> | null;
+          replicas?: Array<{
+            count: c.IntOrString;
+            name: string;
+          }> | null;
+          version?: string | null;
+        } | null;
         path: string;
+        plugin?: {
+          env?: Array<{
+            name: string;
+            value: string;
+          }> | null;
+          name?: string | null;
+          parameters?: Array<{
+            array?: Array<string> | null;
+            map?: Record<string,string> | null;
+            name?: string | null;
+            string?: string | null;
+          }> | null;
+        } | null;
         repoURL: string;
         targetRevision: string;
       };
@@ -493,7 +584,98 @@ export interface Application {
         phase: "Hydrating" | "Failed" | "Hydrated" | c.UnexpectedEnumValue;
         sourceHydrator?: {
           drySource: {
+            directory?: {
+              exclude?: string | null;
+              include?: string | null;
+              jsonnet?: {
+                extVars?: Array<{
+                  code?: boolean | null;
+                  name: string;
+                  value: string;
+                }> | null;
+                libs?: Array<string> | null;
+                tlas?: Array<{
+                  code?: boolean | null;
+                  name: string;
+                  value: string;
+                }> | null;
+              } | null;
+              recurse?: boolean | null;
+            } | null;
+            helm?: {
+              apiVersions?: Array<string> | null;
+              fileParameters?: Array<{
+                name?: string | null;
+                path?: string | null;
+              }> | null;
+              ignoreMissingValueFiles?: boolean | null;
+              kubeVersion?: string | null;
+              namespace?: string | null;
+              parameters?: Array<{
+                forceString?: boolean | null;
+                name?: string | null;
+                value?: string | null;
+              }> | null;
+              passCredentials?: boolean | null;
+              releaseName?: string | null;
+              skipCrds?: boolean | null;
+              skipSchemaValidation?: boolean | null;
+              skipTests?: boolean | null;
+              valueFiles?: Array<string> | null;
+              values?: string | null;
+              valuesObject?: c.JSONValue | null;
+              version?: string | null;
+            } | null;
+            kustomize?: {
+              apiVersions?: Array<string> | null;
+              commonAnnotations?: Record<string,string> | null;
+              commonAnnotationsEnvsubst?: boolean | null;
+              commonLabels?: Record<string,string> | null;
+              components?: Array<string> | null;
+              forceCommonAnnotations?: boolean | null;
+              forceCommonLabels?: boolean | null;
+              ignoreMissingComponents?: boolean | null;
+              images?: Array<string> | null;
+              kubeVersion?: string | null;
+              labelIncludeTemplates?: boolean | null;
+              labelWithoutSelector?: boolean | null;
+              namePrefix?: string | null;
+              nameSuffix?: string | null;
+              namespace?: string | null;
+              patches?: Array<{
+                options?: Record<string,boolean> | null;
+                patch?: string | null;
+                path?: string | null;
+                target?: {
+                  annotationSelector?: string | null;
+                  group?: string | null;
+                  kind?: string | null;
+                  labelSelector?: string | null;
+                  name?: string | null;
+                  namespace?: string | null;
+                  version?: string | null;
+                } | null;
+              }> | null;
+              replicas?: Array<{
+                count: c.IntOrString;
+                name: string;
+              }> | null;
+              version?: string | null;
+            } | null;
             path: string;
+            plugin?: {
+              env?: Array<{
+                name: string;
+                value: string;
+              }> | null;
+              name?: string | null;
+              parameters?: Array<{
+                array?: Array<string> | null;
+                map?: Record<string,string> | null;
+                name?: string | null;
+                string?: string | null;
+              }> | null;
+            } | null;
             repoURL: string;
             targetRevision: string;
           };
@@ -512,7 +694,98 @@ export interface Application {
         hydratedSHA?: string | null;
         sourceHydrator?: {
           drySource: {
+            directory?: {
+              exclude?: string | null;
+              include?: string | null;
+              jsonnet?: {
+                extVars?: Array<{
+                  code?: boolean | null;
+                  name: string;
+                  value: string;
+                }> | null;
+                libs?: Array<string> | null;
+                tlas?: Array<{
+                  code?: boolean | null;
+                  name: string;
+                  value: string;
+                }> | null;
+              } | null;
+              recurse?: boolean | null;
+            } | null;
+            helm?: {
+              apiVersions?: Array<string> | null;
+              fileParameters?: Array<{
+                name?: string | null;
+                path?: string | null;
+              }> | null;
+              ignoreMissingValueFiles?: boolean | null;
+              kubeVersion?: string | null;
+              namespace?: string | null;
+              parameters?: Array<{
+                forceString?: boolean | null;
+                name?: string | null;
+                value?: string | null;
+              }> | null;
+              passCredentials?: boolean | null;
+              releaseName?: string | null;
+              skipCrds?: boolean | null;
+              skipSchemaValidation?: boolean | null;
+              skipTests?: boolean | null;
+              valueFiles?: Array<string> | null;
+              values?: string | null;
+              valuesObject?: c.JSONValue | null;
+              version?: string | null;
+            } | null;
+            kustomize?: {
+              apiVersions?: Array<string> | null;
+              commonAnnotations?: Record<string,string> | null;
+              commonAnnotationsEnvsubst?: boolean | null;
+              commonLabels?: Record<string,string> | null;
+              components?: Array<string> | null;
+              forceCommonAnnotations?: boolean | null;
+              forceCommonLabels?: boolean | null;
+              ignoreMissingComponents?: boolean | null;
+              images?: Array<string> | null;
+              kubeVersion?: string | null;
+              labelIncludeTemplates?: boolean | null;
+              labelWithoutSelector?: boolean | null;
+              namePrefix?: string | null;
+              nameSuffix?: string | null;
+              namespace?: string | null;
+              patches?: Array<{
+                options?: Record<string,boolean> | null;
+                patch?: string | null;
+                path?: string | null;
+                target?: {
+                  annotationSelector?: string | null;
+                  group?: string | null;
+                  kind?: string | null;
+                  labelSelector?: string | null;
+                  name?: string | null;
+                  namespace?: string | null;
+                  version?: string | null;
+                } | null;
+              }> | null;
+              replicas?: Array<{
+                count: c.IntOrString;
+                name: string;
+              }> | null;
+              version?: string | null;
+            } | null;
             path: string;
+            plugin?: {
+              env?: Array<{
+                name: string;
+                value: string;
+              }> | null;
+              name?: string | null;
+              parameters?: Array<{
+                array?: Array<string> | null;
+                map?: Record<string,string> | null;
+                name?: string | null;
+                string?: string | null;
+              }> | null;
+            } | null;
             repoURL: string;
             targetRevision: string;
           };
@@ -854,7 +1127,11 @@ function toApplication_operation_sync_syncStrategy(input: c.JSONValue) {
 function toApplication_spec_sourceHydrator_drySource(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    directory: c.readOpt(obj["directory"], toApplication_spec_sourceHydrator_drySource_directory),
+    helm: c.readOpt(obj["helm"], toApplication_spec_sourceHydrator_drySource_helm),
+    kustomize: c.readOpt(obj["kustomize"], toApplication_spec_sourceHydrator_drySource_kustomize),
     path: c.checkStr(obj["path"]),
+    plugin: c.readOpt(obj["plugin"], toApplication_spec_sourceHydrator_drySource_plugin),
     repoURL: c.checkStr(obj["repoURL"]),
     targetRevision: c.checkStr(obj["targetRevision"]),
   }}
@@ -957,6 +1234,62 @@ function toApplication_operation_sync_syncStrategy_hook(input: c.JSONValue) {
   return {
     force: c.readOpt(obj["force"], c.checkBool),
   }}
+function toApplication_spec_sourceHydrator_drySource_directory(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    exclude: c.readOpt(obj["exclude"], c.checkStr),
+    include: c.readOpt(obj["include"], c.checkStr),
+    jsonnet: c.readOpt(obj["jsonnet"], toApplication_spec_sourceHydrator_drySource_directory_jsonnet),
+    recurse: c.readOpt(obj["recurse"], c.checkBool),
+  }}
+function toApplication_spec_sourceHydrator_drySource_helm(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    apiVersions: c.readOpt(obj["apiVersions"], x => c.readList(x, c.checkStr)),
+    fileParameters: c.readOpt(obj["fileParameters"], x => c.readList(x, toApplication_spec_sourceHydrator_drySource_helm_fileParameters)),
+    ignoreMissingValueFiles: c.readOpt(obj["ignoreMissingValueFiles"], c.checkBool),
+    kubeVersion: c.readOpt(obj["kubeVersion"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    parameters: c.readOpt(obj["parameters"], x => c.readList(x, toApplication_spec_sourceHydrator_drySource_helm_parameters)),
+    passCredentials: c.readOpt(obj["passCredentials"], c.checkBool),
+    releaseName: c.readOpt(obj["releaseName"], c.checkStr),
+    skipCrds: c.readOpt(obj["skipCrds"], c.checkBool),
+    skipSchemaValidation: c.readOpt(obj["skipSchemaValidation"], c.checkBool),
+    skipTests: c.readOpt(obj["skipTests"], c.checkBool),
+    valueFiles: c.readOpt(obj["valueFiles"], x => c.readList(x, c.checkStr)),
+    values: c.readOpt(obj["values"], c.checkStr),
+    valuesObject: c.readOpt(obj["valuesObject"], c.identity),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplication_spec_sourceHydrator_drySource_kustomize(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    apiVersions: c.readOpt(obj["apiVersions"], x => c.readList(x, c.checkStr)),
+    commonAnnotations: c.readOpt(obj["commonAnnotations"], x => c.readMap(x, c.checkStr)),
+    commonAnnotationsEnvsubst: c.readOpt(obj["commonAnnotationsEnvsubst"], c.checkBool),
+    commonLabels: c.readOpt(obj["commonLabels"], x => c.readMap(x, c.checkStr)),
+    components: c.readOpt(obj["components"], x => c.readList(x, c.checkStr)),
+    forceCommonAnnotations: c.readOpt(obj["forceCommonAnnotations"], c.checkBool),
+    forceCommonLabels: c.readOpt(obj["forceCommonLabels"], c.checkBool),
+    ignoreMissingComponents: c.readOpt(obj["ignoreMissingComponents"], c.checkBool),
+    images: c.readOpt(obj["images"], x => c.readList(x, c.checkStr)),
+    kubeVersion: c.readOpt(obj["kubeVersion"], c.checkStr),
+    labelIncludeTemplates: c.readOpt(obj["labelIncludeTemplates"], c.checkBool),
+    labelWithoutSelector: c.readOpt(obj["labelWithoutSelector"], c.checkBool),
+    namePrefix: c.readOpt(obj["namePrefix"], c.checkStr),
+    nameSuffix: c.readOpt(obj["nameSuffix"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    patches: c.readOpt(obj["patches"], x => c.readList(x, toApplication_spec_sourceHydrator_drySource_kustomize_patches)),
+    replicas: c.readOpt(obj["replicas"], x => c.readList(x, toApplication_spec_sourceHydrator_drySource_kustomize_replicas)),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplication_spec_sourceHydrator_drySource_plugin(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    env: c.readOpt(obj["env"], x => c.readList(x, toApplication_spec_sourceHydrator_drySource_plugin_env)),
+    name: c.readOpt(obj["name"], c.checkStr),
+    parameters: c.readOpt(obj["parameters"], x => c.readList(x, toApplication_spec_sourceHydrator_drySource_plugin_parameters)),
+  }}
 function toApplication_spec_syncPolicy_retry_backoff(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
@@ -1051,6 +1384,54 @@ function toApplication_status_sync_comparedTo_ignoreDifferences(input: c.JSONVal
     name: c.readOpt(obj["name"], c.checkStr),
     namespace: c.readOpt(obj["namespace"], c.checkStr),
   }}
+function toApplication_spec_sourceHydrator_drySource_directory_jsonnet(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    extVars: c.readOpt(obj["extVars"], x => c.readList(x, toApplication_spec_sourceHydrator_drySource_directory_jsonnet_extVars)),
+    libs: c.readOpt(obj["libs"], x => c.readList(x, c.checkStr)),
+    tlas: c.readOpt(obj["tlas"], x => c.readList(x, toApplication_spec_sourceHydrator_drySource_directory_jsonnet_tlas)),
+  }}
+function toApplication_spec_sourceHydrator_drySource_helm_fileParameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    name: c.readOpt(obj["name"], c.checkStr),
+    path: c.readOpt(obj["path"], c.checkStr),
+  }}
+function toApplication_spec_sourceHydrator_drySource_helm_parameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    forceString: c.readOpt(obj["forceString"], c.checkBool),
+    name: c.readOpt(obj["name"], c.checkStr),
+    value: c.readOpt(obj["value"], c.checkStr),
+  }}
+function toApplication_spec_sourceHydrator_drySource_kustomize_patches(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    options: c.readOpt(obj["options"], x => c.readMap(x, c.checkBool)),
+    patch: c.readOpt(obj["patch"], c.checkStr),
+    path: c.readOpt(obj["path"], c.checkStr),
+    target: c.readOpt(obj["target"], toApplication_spec_sourceHydrator_drySource_kustomize_patches_target),
+  }}
+function toApplication_spec_sourceHydrator_drySource_kustomize_replicas(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    count: c.toIntOrString(obj["count"]),
+    name: c.checkStr(obj["name"]),
+  }}
+function toApplication_spec_sourceHydrator_drySource_plugin_env(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplication_spec_sourceHydrator_drySource_plugin_parameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    array: c.readOpt(obj["array"], x => c.readList(x, c.checkStr)),
+    map: c.readOpt(obj["map"], x => c.readMap(x, c.checkStr)),
+    name: c.readOpt(obj["name"], c.checkStr),
+    string: c.readOpt(obj["string"], c.checkStr),
+  }}
 function toApplication_status_operationState_operation_retry_backoff(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
@@ -1075,7 +1456,11 @@ function toApplication_status_operationState_operation_sync_syncStrategy(input: 
 function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    directory: c.readOpt(obj["directory"], toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_directory),
+    helm: c.readOpt(obj["helm"], toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_helm),
+    kustomize: c.readOpt(obj["kustomize"], toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_kustomize),
     path: c.checkStr(obj["path"]),
+    plugin: c.readOpt(obj["plugin"], toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_plugin),
     repoURL: c.checkStr(obj["repoURL"]),
     targetRevision: c.checkStr(obj["targetRevision"]),
   }}
@@ -1093,7 +1478,11 @@ function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_syn
 function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    directory: c.readOpt(obj["directory"], toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_directory),
+    helm: c.readOpt(obj["helm"], toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_helm),
+    kustomize: c.readOpt(obj["kustomize"], toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_kustomize),
     path: c.checkStr(obj["path"]),
+    plugin: c.readOpt(obj["plugin"], toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_plugin),
     repoURL: c.checkStr(obj["repoURL"]),
     targetRevision: c.checkStr(obj["targetRevision"]),
   }}
@@ -1108,6 +1497,31 @@ function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydra
     path: c.checkStr(obj["path"]),
     targetBranch: c.checkStr(obj["targetBranch"]),
   }}
+function toApplication_spec_sourceHydrator_drySource_directory_jsonnet_extVars(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    code: c.readOpt(obj["code"], c.checkBool),
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplication_spec_sourceHydrator_drySource_directory_jsonnet_tlas(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    code: c.readOpt(obj["code"], c.checkBool),
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplication_spec_sourceHydrator_drySource_kustomize_patches_target(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    annotationSelector: c.readOpt(obj["annotationSelector"], c.checkStr),
+    group: c.readOpt(obj["group"], c.checkStr),
+    kind: c.readOpt(obj["kind"], c.checkStr),
+    labelSelector: c.readOpt(obj["labelSelector"], c.checkStr),
+    name: c.readOpt(obj["name"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
 function toApplication_status_operationState_operation_sync_syncStrategy_apply(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
@@ -1117,6 +1531,264 @@ function toApplication_status_operationState_operation_sync_syncStrategy_hook(in
   const obj = c.checkObj(input);
   return {
     force: c.readOpt(obj["force"], c.checkBool),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_directory(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    exclude: c.readOpt(obj["exclude"], c.checkStr),
+    include: c.readOpt(obj["include"], c.checkStr),
+    jsonnet: c.readOpt(obj["jsonnet"], toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_directory_jsonnet),
+    recurse: c.readOpt(obj["recurse"], c.checkBool),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_helm(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    apiVersions: c.readOpt(obj["apiVersions"], x => c.readList(x, c.checkStr)),
+    fileParameters: c.readOpt(obj["fileParameters"], x => c.readList(x, toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_helm_fileParameters)),
+    ignoreMissingValueFiles: c.readOpt(obj["ignoreMissingValueFiles"], c.checkBool),
+    kubeVersion: c.readOpt(obj["kubeVersion"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    parameters: c.readOpt(obj["parameters"], x => c.readList(x, toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_helm_parameters)),
+    passCredentials: c.readOpt(obj["passCredentials"], c.checkBool),
+    releaseName: c.readOpt(obj["releaseName"], c.checkStr),
+    skipCrds: c.readOpt(obj["skipCrds"], c.checkBool),
+    skipSchemaValidation: c.readOpt(obj["skipSchemaValidation"], c.checkBool),
+    skipTests: c.readOpt(obj["skipTests"], c.checkBool),
+    valueFiles: c.readOpt(obj["valueFiles"], x => c.readList(x, c.checkStr)),
+    values: c.readOpt(obj["values"], c.checkStr),
+    valuesObject: c.readOpt(obj["valuesObject"], c.identity),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_kustomize(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    apiVersions: c.readOpt(obj["apiVersions"], x => c.readList(x, c.checkStr)),
+    commonAnnotations: c.readOpt(obj["commonAnnotations"], x => c.readMap(x, c.checkStr)),
+    commonAnnotationsEnvsubst: c.readOpt(obj["commonAnnotationsEnvsubst"], c.checkBool),
+    commonLabels: c.readOpt(obj["commonLabels"], x => c.readMap(x, c.checkStr)),
+    components: c.readOpt(obj["components"], x => c.readList(x, c.checkStr)),
+    forceCommonAnnotations: c.readOpt(obj["forceCommonAnnotations"], c.checkBool),
+    forceCommonLabels: c.readOpt(obj["forceCommonLabels"], c.checkBool),
+    ignoreMissingComponents: c.readOpt(obj["ignoreMissingComponents"], c.checkBool),
+    images: c.readOpt(obj["images"], x => c.readList(x, c.checkStr)),
+    kubeVersion: c.readOpt(obj["kubeVersion"], c.checkStr),
+    labelIncludeTemplates: c.readOpt(obj["labelIncludeTemplates"], c.checkBool),
+    labelWithoutSelector: c.readOpt(obj["labelWithoutSelector"], c.checkBool),
+    namePrefix: c.readOpt(obj["namePrefix"], c.checkStr),
+    nameSuffix: c.readOpt(obj["nameSuffix"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    patches: c.readOpt(obj["patches"], x => c.readList(x, toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_kustomize_patches)),
+    replicas: c.readOpt(obj["replicas"], x => c.readList(x, toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_kustomize_replicas)),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_plugin(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    env: c.readOpt(obj["env"], x => c.readList(x, toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_plugin_env)),
+    name: c.readOpt(obj["name"], c.checkStr),
+    parameters: c.readOpt(obj["parameters"], x => c.readList(x, toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_plugin_parameters)),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_directory(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    exclude: c.readOpt(obj["exclude"], c.checkStr),
+    include: c.readOpt(obj["include"], c.checkStr),
+    jsonnet: c.readOpt(obj["jsonnet"], toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_directory_jsonnet),
+    recurse: c.readOpt(obj["recurse"], c.checkBool),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_helm(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    apiVersions: c.readOpt(obj["apiVersions"], x => c.readList(x, c.checkStr)),
+    fileParameters: c.readOpt(obj["fileParameters"], x => c.readList(x, toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_helm_fileParameters)),
+    ignoreMissingValueFiles: c.readOpt(obj["ignoreMissingValueFiles"], c.checkBool),
+    kubeVersion: c.readOpt(obj["kubeVersion"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    parameters: c.readOpt(obj["parameters"], x => c.readList(x, toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_helm_parameters)),
+    passCredentials: c.readOpt(obj["passCredentials"], c.checkBool),
+    releaseName: c.readOpt(obj["releaseName"], c.checkStr),
+    skipCrds: c.readOpt(obj["skipCrds"], c.checkBool),
+    skipSchemaValidation: c.readOpt(obj["skipSchemaValidation"], c.checkBool),
+    skipTests: c.readOpt(obj["skipTests"], c.checkBool),
+    valueFiles: c.readOpt(obj["valueFiles"], x => c.readList(x, c.checkStr)),
+    values: c.readOpt(obj["values"], c.checkStr),
+    valuesObject: c.readOpt(obj["valuesObject"], c.identity),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_kustomize(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    apiVersions: c.readOpt(obj["apiVersions"], x => c.readList(x, c.checkStr)),
+    commonAnnotations: c.readOpt(obj["commonAnnotations"], x => c.readMap(x, c.checkStr)),
+    commonAnnotationsEnvsubst: c.readOpt(obj["commonAnnotationsEnvsubst"], c.checkBool),
+    commonLabels: c.readOpt(obj["commonLabels"], x => c.readMap(x, c.checkStr)),
+    components: c.readOpt(obj["components"], x => c.readList(x, c.checkStr)),
+    forceCommonAnnotations: c.readOpt(obj["forceCommonAnnotations"], c.checkBool),
+    forceCommonLabels: c.readOpt(obj["forceCommonLabels"], c.checkBool),
+    ignoreMissingComponents: c.readOpt(obj["ignoreMissingComponents"], c.checkBool),
+    images: c.readOpt(obj["images"], x => c.readList(x, c.checkStr)),
+    kubeVersion: c.readOpt(obj["kubeVersion"], c.checkStr),
+    labelIncludeTemplates: c.readOpt(obj["labelIncludeTemplates"], c.checkBool),
+    labelWithoutSelector: c.readOpt(obj["labelWithoutSelector"], c.checkBool),
+    namePrefix: c.readOpt(obj["namePrefix"], c.checkStr),
+    nameSuffix: c.readOpt(obj["nameSuffix"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    patches: c.readOpt(obj["patches"], x => c.readList(x, toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_kustomize_patches)),
+    replicas: c.readOpt(obj["replicas"], x => c.readList(x, toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_kustomize_replicas)),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_plugin(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    env: c.readOpt(obj["env"], x => c.readList(x, toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_plugin_env)),
+    name: c.readOpt(obj["name"], c.checkStr),
+    parameters: c.readOpt(obj["parameters"], x => c.readList(x, toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_plugin_parameters)),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_directory_jsonnet(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    extVars: c.readOpt(obj["extVars"], x => c.readList(x, toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_directory_jsonnet_extVars)),
+    libs: c.readOpt(obj["libs"], x => c.readList(x, c.checkStr)),
+    tlas: c.readOpt(obj["tlas"], x => c.readList(x, toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_directory_jsonnet_tlas)),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_helm_fileParameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    name: c.readOpt(obj["name"], c.checkStr),
+    path: c.readOpt(obj["path"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_helm_parameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    forceString: c.readOpt(obj["forceString"], c.checkBool),
+    name: c.readOpt(obj["name"], c.checkStr),
+    value: c.readOpt(obj["value"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_kustomize_patches(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    options: c.readOpt(obj["options"], x => c.readMap(x, c.checkBool)),
+    patch: c.readOpt(obj["patch"], c.checkStr),
+    path: c.readOpt(obj["path"], c.checkStr),
+    target: c.readOpt(obj["target"], toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_kustomize_patches_target),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_kustomize_replicas(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    count: c.toIntOrString(obj["count"]),
+    name: c.checkStr(obj["name"]),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_plugin_env(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_plugin_parameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    array: c.readOpt(obj["array"], x => c.readList(x, c.checkStr)),
+    map: c.readOpt(obj["map"], x => c.readMap(x, c.checkStr)),
+    name: c.readOpt(obj["name"], c.checkStr),
+    string: c.readOpt(obj["string"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_directory_jsonnet(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    extVars: c.readOpt(obj["extVars"], x => c.readList(x, toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_directory_jsonnet_extVars)),
+    libs: c.readOpt(obj["libs"], x => c.readList(x, c.checkStr)),
+    tlas: c.readOpt(obj["tlas"], x => c.readList(x, toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_directory_jsonnet_tlas)),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_helm_fileParameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    name: c.readOpt(obj["name"], c.checkStr),
+    path: c.readOpt(obj["path"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_helm_parameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    forceString: c.readOpt(obj["forceString"], c.checkBool),
+    name: c.readOpt(obj["name"], c.checkStr),
+    value: c.readOpt(obj["value"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_kustomize_patches(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    options: c.readOpt(obj["options"], x => c.readMap(x, c.checkBool)),
+    patch: c.readOpt(obj["patch"], c.checkStr),
+    path: c.readOpt(obj["path"], c.checkStr),
+    target: c.readOpt(obj["target"], toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_kustomize_patches_target),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_kustomize_replicas(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    count: c.toIntOrString(obj["count"]),
+    name: c.checkStr(obj["name"]),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_plugin_env(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_plugin_parameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    array: c.readOpt(obj["array"], x => c.readList(x, c.checkStr)),
+    map: c.readOpt(obj["map"], x => c.readMap(x, c.checkStr)),
+    name: c.readOpt(obj["name"], c.checkStr),
+    string: c.readOpt(obj["string"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_directory_jsonnet_extVars(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    code: c.readOpt(obj["code"], c.checkBool),
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_directory_jsonnet_tlas(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    code: c.readOpt(obj["code"], c.checkBool),
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplication_status_sourceHydrator_currentOperation_sourceHydrator_drySource_kustomize_patches_target(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    annotationSelector: c.readOpt(obj["annotationSelector"], c.checkStr),
+    group: c.readOpt(obj["group"], c.checkStr),
+    kind: c.readOpt(obj["kind"], c.checkStr),
+    labelSelector: c.readOpt(obj["labelSelector"], c.checkStr),
+    name: c.readOpt(obj["name"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_directory_jsonnet_extVars(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    code: c.readOpt(obj["code"], c.checkBool),
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_directory_jsonnet_tlas(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    code: c.readOpt(obj["code"], c.checkBool),
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplication_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_kustomize_patches_target(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    annotationSelector: c.readOpt(obj["annotationSelector"], c.checkStr),
+    group: c.readOpt(obj["group"], c.checkStr),
+    kind: c.readOpt(obj["kind"], c.checkStr),
+    labelSelector: c.readOpt(obj["labelSelector"], c.checkStr),
+    name: c.readOpt(obj["name"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    version: c.readOpt(obj["version"], c.checkStr),
   }}
 
 export interface ApplicationList extends ListOf<Application> {
@@ -1891,7 +2563,98 @@ export interface ApplicationTemplate {
     source?: ApplicationSource | null;
     sourceHydrator?: {
       drySource: {
+        directory?: {
+          exclude?: string | null;
+          include?: string | null;
+          jsonnet?: {
+            extVars?: Array<{
+              code?: boolean | null;
+              name: string;
+              value: string;
+            }> | null;
+            libs?: Array<string> | null;
+            tlas?: Array<{
+              code?: boolean | null;
+              name: string;
+              value: string;
+            }> | null;
+          } | null;
+          recurse?: boolean | null;
+        } | null;
+        helm?: {
+          apiVersions?: Array<string> | null;
+          fileParameters?: Array<{
+            name?: string | null;
+            path?: string | null;
+          }> | null;
+          ignoreMissingValueFiles?: boolean | null;
+          kubeVersion?: string | null;
+          namespace?: string | null;
+          parameters?: Array<{
+            forceString?: boolean | null;
+            name?: string | null;
+            value?: string | null;
+          }> | null;
+          passCredentials?: boolean | null;
+          releaseName?: string | null;
+          skipCrds?: boolean | null;
+          skipSchemaValidation?: boolean | null;
+          skipTests?: boolean | null;
+          valueFiles?: Array<string> | null;
+          values?: string | null;
+          valuesObject?: c.JSONValue | null;
+          version?: string | null;
+        } | null;
+        kustomize?: {
+          apiVersions?: Array<string> | null;
+          commonAnnotations?: Record<string,string> | null;
+          commonAnnotationsEnvsubst?: boolean | null;
+          commonLabels?: Record<string,string> | null;
+          components?: Array<string> | null;
+          forceCommonAnnotations?: boolean | null;
+          forceCommonLabels?: boolean | null;
+          ignoreMissingComponents?: boolean | null;
+          images?: Array<string> | null;
+          kubeVersion?: string | null;
+          labelIncludeTemplates?: boolean | null;
+          labelWithoutSelector?: boolean | null;
+          namePrefix?: string | null;
+          nameSuffix?: string | null;
+          namespace?: string | null;
+          patches?: Array<{
+            options?: Record<string,boolean> | null;
+            patch?: string | null;
+            path?: string | null;
+            target?: {
+              annotationSelector?: string | null;
+              group?: string | null;
+              kind?: string | null;
+              labelSelector?: string | null;
+              name?: string | null;
+              namespace?: string | null;
+              version?: string | null;
+            } | null;
+          }> | null;
+          replicas?: Array<{
+            count: c.IntOrString;
+            name: string;
+          }> | null;
+          version?: string | null;
+        } | null;
         path: string;
+        plugin?: {
+          env?: Array<{
+            name: string;
+            value: string;
+          }> | null;
+          name?: string | null;
+          parameters?: Array<{
+            array?: Array<string> | null;
+            map?: Record<string,string> | null;
+            name?: string | null;
+            string?: string | null;
+          }> | null;
+        } | null;
         repoURL: string;
         targetRevision: string;
       };
@@ -2007,7 +2770,11 @@ function toApplicationTemplate_spec_syncPolicy(input: c.JSONValue) {
 function toApplicationTemplate_spec_sourceHydrator_drySource(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
+    directory: c.readOpt(obj["directory"], toApplicationTemplate_spec_sourceHydrator_drySource_directory),
+    helm: c.readOpt(obj["helm"], toApplicationTemplate_spec_sourceHydrator_drySource_helm),
+    kustomize: c.readOpt(obj["kustomize"], toApplicationTemplate_spec_sourceHydrator_drySource_kustomize),
     path: c.checkStr(obj["path"]),
+    plugin: c.readOpt(obj["plugin"], toApplicationTemplate_spec_sourceHydrator_drySource_plugin),
     repoURL: c.checkStr(obj["repoURL"]),
     targetRevision: c.checkStr(obj["targetRevision"]),
   }}
@@ -2043,12 +2810,141 @@ function toApplicationTemplate_spec_syncPolicy_retry(input: c.JSONValue) {
     limit: c.readOpt(obj["limit"], c.checkNum),
     refresh: c.readOpt(obj["refresh"], c.checkBool),
   }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_directory(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    exclude: c.readOpt(obj["exclude"], c.checkStr),
+    include: c.readOpt(obj["include"], c.checkStr),
+    jsonnet: c.readOpt(obj["jsonnet"], toApplicationTemplate_spec_sourceHydrator_drySource_directory_jsonnet),
+    recurse: c.readOpt(obj["recurse"], c.checkBool),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_helm(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    apiVersions: c.readOpt(obj["apiVersions"], x => c.readList(x, c.checkStr)),
+    fileParameters: c.readOpt(obj["fileParameters"], x => c.readList(x, toApplicationTemplate_spec_sourceHydrator_drySource_helm_fileParameters)),
+    ignoreMissingValueFiles: c.readOpt(obj["ignoreMissingValueFiles"], c.checkBool),
+    kubeVersion: c.readOpt(obj["kubeVersion"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    parameters: c.readOpt(obj["parameters"], x => c.readList(x, toApplicationTemplate_spec_sourceHydrator_drySource_helm_parameters)),
+    passCredentials: c.readOpt(obj["passCredentials"], c.checkBool),
+    releaseName: c.readOpt(obj["releaseName"], c.checkStr),
+    skipCrds: c.readOpt(obj["skipCrds"], c.checkBool),
+    skipSchemaValidation: c.readOpt(obj["skipSchemaValidation"], c.checkBool),
+    skipTests: c.readOpt(obj["skipTests"], c.checkBool),
+    valueFiles: c.readOpt(obj["valueFiles"], x => c.readList(x, c.checkStr)),
+    values: c.readOpt(obj["values"], c.checkStr),
+    valuesObject: c.readOpt(obj["valuesObject"], c.identity),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_kustomize(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    apiVersions: c.readOpt(obj["apiVersions"], x => c.readList(x, c.checkStr)),
+    commonAnnotations: c.readOpt(obj["commonAnnotations"], x => c.readMap(x, c.checkStr)),
+    commonAnnotationsEnvsubst: c.readOpt(obj["commonAnnotationsEnvsubst"], c.checkBool),
+    commonLabels: c.readOpt(obj["commonLabels"], x => c.readMap(x, c.checkStr)),
+    components: c.readOpt(obj["components"], x => c.readList(x, c.checkStr)),
+    forceCommonAnnotations: c.readOpt(obj["forceCommonAnnotations"], c.checkBool),
+    forceCommonLabels: c.readOpt(obj["forceCommonLabels"], c.checkBool),
+    ignoreMissingComponents: c.readOpt(obj["ignoreMissingComponents"], c.checkBool),
+    images: c.readOpt(obj["images"], x => c.readList(x, c.checkStr)),
+    kubeVersion: c.readOpt(obj["kubeVersion"], c.checkStr),
+    labelIncludeTemplates: c.readOpt(obj["labelIncludeTemplates"], c.checkBool),
+    labelWithoutSelector: c.readOpt(obj["labelWithoutSelector"], c.checkBool),
+    namePrefix: c.readOpt(obj["namePrefix"], c.checkStr),
+    nameSuffix: c.readOpt(obj["nameSuffix"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    patches: c.readOpt(obj["patches"], x => c.readList(x, toApplicationTemplate_spec_sourceHydrator_drySource_kustomize_patches)),
+    replicas: c.readOpt(obj["replicas"], x => c.readList(x, toApplicationTemplate_spec_sourceHydrator_drySource_kustomize_replicas)),
+    version: c.readOpt(obj["version"], c.checkStr),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_plugin(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    env: c.readOpt(obj["env"], x => c.readList(x, toApplicationTemplate_spec_sourceHydrator_drySource_plugin_env)),
+    name: c.readOpt(obj["name"], c.checkStr),
+    parameters: c.readOpt(obj["parameters"], x => c.readList(x, toApplicationTemplate_spec_sourceHydrator_drySource_plugin_parameters)),
+  }}
 function toApplicationTemplate_spec_syncPolicy_retry_backoff(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
     duration: c.readOpt(obj["duration"], c.checkStr),
     factor: c.readOpt(obj["factor"], c.checkNum),
     maxDuration: c.readOpt(obj["maxDuration"], c.checkStr),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_directory_jsonnet(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    extVars: c.readOpt(obj["extVars"], x => c.readList(x, toApplicationTemplate_spec_sourceHydrator_drySource_directory_jsonnet_extVars)),
+    libs: c.readOpt(obj["libs"], x => c.readList(x, c.checkStr)),
+    tlas: c.readOpt(obj["tlas"], x => c.readList(x, toApplicationTemplate_spec_sourceHydrator_drySource_directory_jsonnet_tlas)),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_helm_fileParameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    name: c.readOpt(obj["name"], c.checkStr),
+    path: c.readOpt(obj["path"], c.checkStr),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_helm_parameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    forceString: c.readOpt(obj["forceString"], c.checkBool),
+    name: c.readOpt(obj["name"], c.checkStr),
+    value: c.readOpt(obj["value"], c.checkStr),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_kustomize_patches(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    options: c.readOpt(obj["options"], x => c.readMap(x, c.checkBool)),
+    patch: c.readOpt(obj["patch"], c.checkStr),
+    path: c.readOpt(obj["path"], c.checkStr),
+    target: c.readOpt(obj["target"], toApplicationTemplate_spec_sourceHydrator_drySource_kustomize_patches_target),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_kustomize_replicas(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    count: c.toIntOrString(obj["count"]),
+    name: c.checkStr(obj["name"]),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_plugin_env(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_plugin_parameters(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    array: c.readOpt(obj["array"], x => c.readList(x, c.checkStr)),
+    map: c.readOpt(obj["map"], x => c.readMap(x, c.checkStr)),
+    name: c.readOpt(obj["name"], c.checkStr),
+    string: c.readOpt(obj["string"], c.checkStr),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_directory_jsonnet_extVars(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    code: c.readOpt(obj["code"], c.checkBool),
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_directory_jsonnet_tlas(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    code: c.readOpt(obj["code"], c.checkBool),
+    name: c.checkStr(obj["name"]),
+    value: c.checkStr(obj["value"]),
+  }}
+function toApplicationTemplate_spec_sourceHydrator_drySource_kustomize_patches_target(input: c.JSONValue) {
+  const obj = c.checkObj(input);
+  return {
+    annotationSelector: c.readOpt(obj["annotationSelector"], c.checkStr),
+    group: c.readOpt(obj["group"], c.checkStr),
+    kind: c.readOpt(obj["kind"], c.checkStr),
+    labelSelector: c.readOpt(obj["labelSelector"], c.checkStr),
+    name: c.readOpt(obj["name"], c.checkStr),
+    namespace: c.readOpt(obj["namespace"], c.checkStr),
+    version: c.readOpt(obj["version"], c.checkStr),
   }}
 
 export interface ApplicationSet {
@@ -2297,10 +3193,12 @@ export interface AppProject {
     clusterResourceBlacklist?: Array<{
       group: string;
       kind: string;
+      name?: string | null;
     }> | null;
     clusterResourceWhitelist?: Array<{
       group: string;
       kind: string;
+      name?: string | null;
     }> | null;
     description?: string | null;
     destinationServiceAccounts?: Array<{
@@ -2411,12 +3309,14 @@ function toAppProject_spec_clusterResourceBlacklist(input: c.JSONValue) {
   return {
     group: c.checkStr(obj["group"]),
     kind: c.checkStr(obj["kind"]),
+    name: c.readOpt(obj["name"], c.checkStr),
   }}
 function toAppProject_spec_clusterResourceWhitelist(input: c.JSONValue) {
   const obj = c.checkObj(input);
   return {
     group: c.checkStr(obj["group"]),
     kind: c.checkStr(obj["kind"]),
+    name: c.readOpt(obj["name"], c.checkStr),
   }}
 function toAppProject_spec_destinationServiceAccounts(input: c.JSONValue) {
   const obj = c.checkObj(input);

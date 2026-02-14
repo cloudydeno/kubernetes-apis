@@ -7,35 +7,6 @@ type ListOf<T> = {
   items: Array<T>;
 };
 
-/** CELDeviceSelector contains a CEL expression for selecting a device. */
-export interface CELDeviceSelector {
-  expression: string;
-}
-export function toCELDeviceSelector(input: c.JSONValue): CELDeviceSelector {
-  const obj = c.checkObj(input);
-  return {
-    expression: c.checkStr(obj["expression"]),
-  }}
-export function fromCELDeviceSelector(input: CELDeviceSelector): c.JSONValue {
-  return {
-    ...input,
-  }}
-
-/** DeviceSelector must have exactly one field set. */
-export interface DeviceSelector {
-  cel?: CELDeviceSelector | null;
-}
-export function toDeviceSelector(input: c.JSONValue): DeviceSelector {
-  const obj = c.checkObj(input);
-  return {
-    cel: c.readOpt(obj["cel"], toCELDeviceSelector),
-  }}
-export function fromDeviceSelector(input: DeviceSelector): c.JSONValue {
-  return {
-    ...input,
-    cel: input.cel != null ? fromCELDeviceSelector(input.cel) : undefined,
-  }}
-
 /** The device this taint is attached to has the "effect" on any claim which does not tolerate the taint and, through the claim, to pods using the claim. */
 export interface DeviceTaint {
   effect: string;
@@ -63,6 +34,7 @@ export interface DeviceTaintRule {
   kind?: "DeviceTaintRule";
   metadata?: MetaV1.ObjectMeta | null;
   spec: DeviceTaintRuleSpec;
+  status?: DeviceTaintRuleStatus | null;
 }
 export function toDeviceTaintRule(input: c.JSONValue): DeviceTaintRule & c.ApiKind {
   const obj = c.checkObj(input);
@@ -70,6 +42,7 @@ export function toDeviceTaintRule(input: c.JSONValue): DeviceTaintRule & c.ApiKi
     ...c.assertOrAddApiVersionAndKind(obj, "resource.k8s.io/v1alpha3", "DeviceTaintRule"),
     metadata: c.readOpt(obj["metadata"], MetaV1.toObjectMeta),
     spec: toDeviceTaintRuleSpec(obj["spec"]),
+    status: c.readOpt(obj["status"], toDeviceTaintRuleStatus),
   }}
 export function fromDeviceTaintRule(input: DeviceTaintRule): c.JSONValue {
   return {
@@ -77,6 +50,7 @@ export function fromDeviceTaintRule(input: DeviceTaintRule): c.JSONValue {
     ...input,
     metadata: input.metadata != null ? MetaV1.fromObjectMeta(input.metadata) : undefined,
     spec: input.spec != null ? fromDeviceTaintRuleSpec(input.spec) : undefined,
+    status: input.status != null ? fromDeviceTaintRuleStatus(input.status) : undefined,
   }}
 
 /** DeviceTaintRuleSpec specifies the selector and one taint. */
@@ -100,24 +74,34 @@ export function fromDeviceTaintRuleSpec(input: DeviceTaintRuleSpec): c.JSONValue
 /** DeviceTaintSelector defines which device(s) a DeviceTaintRule applies to. The empty selector matches all devices. Without a selector, no devices are matched. */
 export interface DeviceTaintSelector {
   device?: string | null;
-  deviceClassName?: string | null;
   driver?: string | null;
   pool?: string | null;
-  selectors?: Array<DeviceSelector> | null;
 }
 export function toDeviceTaintSelector(input: c.JSONValue): DeviceTaintSelector {
   const obj = c.checkObj(input);
   return {
     device: c.readOpt(obj["device"], c.checkStr),
-    deviceClassName: c.readOpt(obj["deviceClassName"], c.checkStr),
     driver: c.readOpt(obj["driver"], c.checkStr),
     pool: c.readOpt(obj["pool"], c.checkStr),
-    selectors: c.readOpt(obj["selectors"], x => c.readList(x, toDeviceSelector)),
   }}
 export function fromDeviceTaintSelector(input: DeviceTaintSelector): c.JSONValue {
   return {
     ...input,
-    selectors: input.selectors?.map(fromDeviceSelector),
+  }}
+
+/** DeviceTaintRuleStatus provides information about an on-going pod eviction. */
+export interface DeviceTaintRuleStatus {
+  conditions?: Array<MetaV1.Condition> | null;
+}
+export function toDeviceTaintRuleStatus(input: c.JSONValue): DeviceTaintRuleStatus {
+  const obj = c.checkObj(input);
+  return {
+    conditions: c.readOpt(obj["conditions"], x => c.readList(x, MetaV1.toCondition)),
+  }}
+export function fromDeviceTaintRuleStatus(input: DeviceTaintRuleStatus): c.JSONValue {
+  return {
+    ...input,
+    conditions: input.conditions?.map(MetaV1.fromCondition),
   }}
 
 /** DeviceTaintRuleList is a collection of DeviceTaintRules. */

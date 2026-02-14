@@ -39,10 +39,10 @@
     "./resource.k8s.io/v1beta1": "./builtin/resource.k8s.io@v1beta1/mod.ts",
     "./resource.k8s.io/v1beta2": "./builtin/resource.k8s.io@v1beta2/mod.ts",
     "./scheduling.k8s.io/v1": "./builtin/scheduling.k8s.io@v1/mod.ts",
+    "./scheduling.k8s.io/v1alpha1": "./builtin/scheduling.k8s.io@v1alpha1/mod.ts",
     "./storage.k8s.io/v1": "./builtin/storage.k8s.io@v1/mod.ts",
-    "./storage.k8s.io/v1alpha1": "./builtin/storage.k8s.io@v1alpha1/mod.ts",
     "./storage.k8s.io/v1beta1": "./builtin/storage.k8s.io@v1beta1/mod.ts",
-    "./storagemigration.k8s.io/v1alpha1": "./builtin/storagemigration.k8s.io@v1alpha1/mod.ts",
+    "./storagemigration.k8s.io/v1beta1": "./builtin/storagemigration.k8s.io@v1beta1/mod.ts",
 
     "./argoproj.io/v1alpha1": "./argo-cd/argoproj.io@v1alpha1/mod.ts",
 
