@@ -44,6 +44,16 @@ for more information.
 
 ## Changelog
 
+* `v0.7.1` on `2026.02.16`:
+  * Includes 'builtin' APIs generated from K8s `v1.35.1`.
+    * New APIs:
+      * `scheduling.k8s.io/v1alpha1` with kind `Workload`
+    * A new `GroupResource` struct is added to `meta/v1` for other APIs to reference
+    * `resource.k8s.io/v1alpha3 DeviceTaintRule` has a Status field now
+    * Removed API versions: (BREAKING)
+      * `PodCertificateRequest` in `certificates.k8s.io/v1alpha1` ⚠ migrate to `certificates.k8s.io/v1beta1`
+  * `argo-cd` and `vpa` CRDs have been updated to latest, adding several fields.
+
 * `v0.7.0` on `2025-12-04`:
   * Update `@cloudydeno/kubernetes-client` dependency to latest (`v0.8.0`)
     * Breaking Change! Because tunnels were reimplemented, the client's type signature
