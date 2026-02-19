@@ -1,6 +1,6 @@
 {
   "name": "@cloudydeno/kubernetes-apis",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "imports": {
     "@cloudydeno/kubernetes-client": "jsr:@cloudydeno/kubernetes-client@^0.8"
   },
@@ -53,6 +53,8 @@
 
     "./autoscaling.k8s.io/v1": "./vpa/autoscaling.k8s.io@v1/mod.ts",
 
+    "./core/v1/pod-health": "./contrib/core-v1-pod-health.ts",
+
     "./common.ts": "./common.ts",
     "./deps.ts": "./deps.ts",
     "./operations.ts": "./operations.ts",
@@ -60,7 +62,7 @@
   },
   "publish": {
     "exclude": [
-      "examples",
+      "examples"
     ]
   }
 }

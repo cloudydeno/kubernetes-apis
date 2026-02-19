@@ -1,5 +1,5 @@
-import { assertEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
-import { StdioTunnel, type ExecStatus, PortforwardTunnel } from "./tunnels.ts";
+import { assertEquals } from "@std/assert/equals";
+import { StdioTunnel, type ExecStatus, PortforwardTunnel } from "@cloudydeno/kubernetes-apis/tunnels.ts";
 
 Deno.test('stdiotunnel output buffering', async () => {
   const intendedStdout = 'hello world';
