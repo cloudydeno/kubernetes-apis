@@ -38,6 +38,7 @@ export interface CSIDriverSpec {
   podInfoOnMount?: boolean | null;
   requiresRepublish?: boolean | null;
   seLinuxMount?: boolean | null;
+  serviceAccountTokenInSecrets?: boolean | null;
   storageCapacity?: boolean | null;
   tokenRequests?: Array<TokenRequest> | null;
   volumeLifecycleModes?: Array<string> | null;
@@ -51,6 +52,7 @@ export function toCSIDriverSpec(input: c.JSONValue): CSIDriverSpec {
     podInfoOnMount: c.readOpt(obj["podInfoOnMount"], c.checkBool),
     requiresRepublish: c.readOpt(obj["requiresRepublish"], c.checkBool),
     seLinuxMount: c.readOpt(obj["seLinuxMount"], c.checkBool),
+    serviceAccountTokenInSecrets: c.readOpt(obj["serviceAccountTokenInSecrets"], c.checkBool),
     storageCapacity: c.readOpt(obj["storageCapacity"], c.checkBool),
     tokenRequests: c.readOpt(obj["tokenRequests"], x => c.readList(x, toTokenRequest)),
     volumeLifecycleModes: c.readOpt(obj["volumeLifecycleModes"], x => c.readList(x, c.checkStr)),

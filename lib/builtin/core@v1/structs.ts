@@ -2892,6 +2892,7 @@ export interface NodeStatus {
   conditions?: Array<NodeCondition> | null;
   config?: NodeConfigStatus | null;
   daemonEndpoints?: NodeDaemonEndpoints | null;
+  declaredFeatures?: Array<string> | null;
   features?: NodeFeatures | null;
   images?: Array<ContainerImage> | null;
   nodeInfo?: NodeSystemInfo | null;
@@ -2909,6 +2910,7 @@ export function toNodeStatus(input: c.JSONValue): NodeStatus {
     conditions: c.readOpt(obj["conditions"], x => c.readList(x, toNodeCondition)),
     config: c.readOpt(obj["config"], toNodeConfigStatus),
     daemonEndpoints: c.readOpt(obj["daemonEndpoints"], toNodeDaemonEndpoints),
+    declaredFeatures: c.readOpt(obj["declaredFeatures"], x => c.readList(x, c.checkStr)),
     features: c.readOpt(obj["features"], toNodeFeatures),
     images: c.readOpt(obj["images"], x => c.readList(x, toContainerImage)),
     nodeInfo: c.readOpt(obj["nodeInfo"], toNodeSystemInfo),
@@ -3638,6 +3640,7 @@ export interface PodSpec {
   tolerations?: Array<Toleration> | null;
   topologySpreadConstraints?: Array<TopologySpreadConstraint> | null;
   volumes?: Array<Volume> | null;
+  workloadRef?: WorkloadReference | null;
 }
 export function toPodSpec(input: c.JSONValue): PodSpec {
   const obj = c.checkObj(input);
@@ -3683,6 +3686,7 @@ export function toPodSpec(input: c.JSONValue): PodSpec {
     tolerations: c.readOpt(obj["tolerations"], x => c.readList(x, toToleration)),
     topologySpreadConstraints: c.readOpt(obj["topologySpreadConstraints"], x => c.readList(x, toTopologySpreadConstraint)),
     volumes: c.readOpt(obj["volumes"], x => c.readList(x, toVolume)),
+    workloadRef: c.readOpt(obj["workloadRef"], toWorkloadReference),
   }}
 export function fromPodSpec(input: PodSpec): c.JSONValue {
   return {
@@ -3704,6 +3708,7 @@ export function fromPodSpec(input: PodSpec): c.JSONValue {
     tolerations: input.tolerations?.map(fromToleration),
     topologySpreadConstraints: input.topologySpreadConstraints?.map(fromTopologySpreadConstraint),
     volumes: input.volumes?.map(fromVolume),
+    workloadRef: input.workloadRef != null ? fromWorkloadReference(input.workloadRef) : undefined,
   }}
 
 /** PodDNSConfig defines the DNS parameters of a pod in addition to those generated from DNSPolicy. */
@@ -4072,6 +4077,7 @@ export interface PodCertificateProjection {
   keyType: string;
   maxExpirationSeconds?: number | null;
   signerName: string;
+  userAnnotations?: Record<string,string> | null;
 }
 export function toPodCertificateProjection(input: c.JSONValue): PodCertificateProjection {
   const obj = c.checkObj(input);
@@ -4082,6 +4088,7 @@ export function toPodCertificateProjection(input: c.JSONValue): PodCertificatePr
     keyType: c.checkStr(obj["keyType"]),
     maxExpirationSeconds: c.readOpt(obj["maxExpirationSeconds"], c.checkNum),
     signerName: c.checkStr(obj["signerName"]),
+    userAnnotations: c.readOpt(obj["userAnnotations"], x => c.readMap(x, c.checkStr)),
   }}
 export function fromPodCertificateProjection(input: PodCertificateProjection): c.JSONValue {
   return {
@@ -4235,8 +4242,27 @@ export function fromStorageOSVolumeSource(input: StorageOSVolumeSource): c.JSONV
     secretRef: input.secretRef != null ? fromLocalObjectReference(input.secretRef) : undefined,
   }}
 
+/** WorkloadReference identifies the Workload object and PodGroup membership that a Pod belongs to. The scheduler uses this information to apply workload-aware scheduling semantics. */
+export interface WorkloadReference {
+  name: string;
+  podGroup: string;
+  podGroupReplicaKey?: string | null;
+}
+export function toWorkloadReference(input: c.JSONValue): WorkloadReference {
+  const obj = c.checkObj(input);
+  return {
+    name: c.checkStr(obj["name"]),
+    podGroup: c.checkStr(obj["podGroup"]),
+    podGroupReplicaKey: c.readOpt(obj["podGroupReplicaKey"], c.checkStr),
+  }}
+export function fromWorkloadReference(input: WorkloadReference): c.JSONValue {
+  return {
+    ...input,
+  }}
+
 /** PodStatus represents information about the status of a pod. Status may trail the actual state of a system, especially if the node that hosts the pod cannot contact the control plane. */
 export interface PodStatus {
+  allocatedResources?: Record<string,c.Quantity> | null;
   conditions?: Array<PodCondition> | null;
   containerStatuses?: Array<ContainerStatus> | null;
   ephemeralContainerStatuses?: Array<ContainerStatus> | null;
@@ -4254,11 +4280,13 @@ export interface PodStatus {
   reason?: string | null;
   resize?: string | null;
   resourceClaimStatuses?: Array<PodResourceClaimStatus> | null;
+  resources?: ResourceRequirements | null;
   startTime?: c.Time | null;
 }
 export function toPodStatus(input: c.JSONValue): PodStatus {
   const obj = c.checkObj(input);
   return {
+    allocatedResources: c.readOpt(obj["allocatedResources"], x => c.readMap(x, c.toQuantity)),
     conditions: c.readOpt(obj["conditions"], x => c.readList(x, toPodCondition)),
     containerStatuses: c.readOpt(obj["containerStatuses"], x => c.readList(x, toContainerStatus)),
     ephemeralContainerStatuses: c.readOpt(obj["ephemeralContainerStatuses"], x => c.readList(x, toContainerStatus)),
@@ -4276,11 +4304,13 @@ export function toPodStatus(input: c.JSONValue): PodStatus {
     reason: c.readOpt(obj["reason"], c.checkStr),
     resize: c.readOpt(obj["resize"], c.checkStr),
     resourceClaimStatuses: c.readOpt(obj["resourceClaimStatuses"], x => c.readList(x, toPodResourceClaimStatus)),
+    resources: c.readOpt(obj["resources"], toResourceRequirements),
     startTime: c.readOpt(obj["startTime"], c.toTime),
   }}
 export function fromPodStatus(input: PodStatus): c.JSONValue {
   return {
     ...input,
+    allocatedResources: c.writeMap(input.allocatedResources, c.fromQuantity),
     conditions: input.conditions?.map(fromPodCondition),
     containerStatuses: input.containerStatuses?.map(fromContainerStatus),
     ephemeralContainerStatuses: input.ephemeralContainerStatuses?.map(fromContainerStatus),
@@ -4289,6 +4319,7 @@ export function fromPodStatus(input: PodStatus): c.JSONValue {
     initContainerStatuses: input.initContainerStatuses?.map(fromContainerStatus),
     podIPs: input.podIPs?.map(fromPodIP),
     resourceClaimStatuses: input.resourceClaimStatuses?.map(fromPodResourceClaimStatus),
+    resources: input.resources != null ? fromResourceRequirements(input.resources) : undefined,
     startTime: input.startTime != null ? c.fromTime(input.startTime) : undefined,
   }}
 

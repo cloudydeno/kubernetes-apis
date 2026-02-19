@@ -246,6 +246,22 @@ Each key is either a '.' representing the field itself, and will always map to a
 The exact format is defined in sigs.k8s.io/structured-merge-diff */
 export type FieldsV1 = c.JSONValue;
 
+/** GroupResource specifies a Group and a Resource, but does not force a version.  This is useful for identifying concepts during lookup stages without having partially valid types */
+export interface GroupResource {
+  group: string;
+  resource: string;
+}
+export function toGroupResource(input: c.JSONValue): GroupResource {
+  const obj = c.checkObj(input);
+  return {
+    group: c.checkStr(obj["group"]),
+    resource: c.checkStr(obj["resource"]),
+  }}
+export function fromGroupResource(input: GroupResource): c.JSONValue {
+  return {
+    ...input,
+  }}
+
 /** A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects. */
 export interface LabelSelector {
   matchExpressions?: Array<LabelSelectorRequirement> | null;

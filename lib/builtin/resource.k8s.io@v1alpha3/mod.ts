@@ -130,4 +130,51 @@ export class ResourceV1alpha3Api {
     return ResourceV1alpha3.toDeviceTaintRule(resp);
   }
 
+  async getDeviceTaintRuleStatus(
+    name: string,
+    opts: operations.NoOpts = {},
+  ): Promise<ResourceV1alpha3.DeviceTaintRule> {
+    const resp = await this.#client.performRequest({
+      method: "GET",
+      path: `${this.#root}devicetaintrules/${name}/status`,
+      expectJson: true,
+      abortSignal: opts.abortSignal,
+    });
+    return ResourceV1alpha3.toDeviceTaintRule(resp);
+  }
+
+  async replaceDeviceTaintRuleStatus(
+    name: string,
+    body: ResourceV1alpha3.DeviceTaintRule,
+    opts: operations.PutOpts = {},
+  ): Promise<ResourceV1alpha3.DeviceTaintRule> {
+    const resp = await this.#client.performRequest({
+      method: "PUT",
+      path: `${this.#root}devicetaintrules/${name}/status`,
+      expectJson: true,
+      querystring: operations.formatPutOpts(opts),
+      bodyJson: ResourceV1alpha3.fromDeviceTaintRule(body),
+      abortSignal: opts.abortSignal,
+    });
+    return ResourceV1alpha3.toDeviceTaintRule(resp);
+  }
+
+  async patchDeviceTaintRuleStatus(
+    name: string,
+    type: c.PatchType,
+    body: ResourceV1alpha3.DeviceTaintRule | c.JsonPatch,
+    opts: operations.PatchOpts = {},
+  ): Promise<ResourceV1alpha3.DeviceTaintRule> {
+    const resp = await this.#client.performRequest({
+      method: "PATCH",
+      path: `${this.#root}devicetaintrules/${name}/status`,
+      expectJson: true,
+      querystring: operations.formatPatchOpts(opts),
+      contentType: c.getPatchContentType(type),
+      bodyJson: Array.isArray(body) ? body : ResourceV1alpha3.fromDeviceTaintRule(body),
+      abortSignal: opts.abortSignal,
+    });
+    return ResourceV1alpha3.toDeviceTaintRule(resp);
+  }
+
 }

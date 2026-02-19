@@ -183,13 +183,13 @@ export function fromPodFailurePolicyOnExitCodesRequirement(input: PodFailurePoli
 
 /** PodFailurePolicyOnPodConditionsPattern describes a pattern for matching an actual pod condition type. */
 export interface PodFailurePolicyOnPodConditionsPattern {
-  status: string;
+  status?: string | null;
   type: string;
 }
 export function toPodFailurePolicyOnPodConditionsPattern(input: c.JSONValue): PodFailurePolicyOnPodConditionsPattern {
   const obj = c.checkObj(input);
   return {
-    status: c.checkStr(obj["status"]),
+    status: c.readOpt(obj["status"], c.checkStr),
     type: c.checkStr(obj["type"]),
   }}
 export function fromPodFailurePolicyOnPodConditionsPattern(input: PodFailurePolicyOnPodConditionsPattern): c.JSONValue {

@@ -126,6 +126,8 @@ export interface VerticalPodAutoscaler {
         maxAllowed?: Record<string,c.IntOrString> | null;
         minAllowed?: Record<string,c.IntOrString> | null;
         mode?: "Auto" | "Off" | c.UnexpectedEnumValue | null;
+        oomBumpUpRatio?: c.IntOrString | null;
+        oomMinBumpUp?: c.IntOrString | null;
       }> | null;
     } | null;
     targetRef: {
@@ -243,6 +245,8 @@ function toVerticalPodAutoscaler_spec_resourcePolicy_containerPolicies(input: c.
     maxAllowed: c.readOpt(obj["maxAllowed"], x => c.readMap(x, c.toIntOrString)),
     minAllowed: c.readOpt(obj["minAllowed"], x => c.readMap(x, c.toIntOrString)),
     mode: c.readOpt(obj["mode"], (x => c.readEnum<"Auto" | "Off" | c.UnexpectedEnumValue>(x))),
+    oomBumpUpRatio: c.readOpt(obj["oomBumpUpRatio"], c.toIntOrString),
+    oomMinBumpUp: c.readOpt(obj["oomMinBumpUp"], c.toIntOrString),
   }}
 function toVerticalPodAutoscaler_spec_updatePolicy_evictionRequirements(input: c.JSONValue) {
   const obj = c.checkObj(input);

@@ -456,6 +456,7 @@ export function fromCustomResourceSubresourceStatus(input: CustomResourceSubreso
 export interface CustomResourceDefinitionStatus {
   acceptedNames?: CustomResourceDefinitionNames | null;
   conditions?: Array<CustomResourceDefinitionCondition> | null;
+  observedGeneration?: number | null;
   storedVersions?: Array<string> | null;
 }
 export function toCustomResourceDefinitionStatus(input: c.JSONValue): CustomResourceDefinitionStatus {
@@ -463,6 +464,7 @@ export function toCustomResourceDefinitionStatus(input: c.JSONValue): CustomReso
   return {
     acceptedNames: c.readOpt(obj["acceptedNames"], toCustomResourceDefinitionNames),
     conditions: c.readOpt(obj["conditions"], x => c.readList(x, toCustomResourceDefinitionCondition)),
+    observedGeneration: c.readOpt(obj["observedGeneration"], c.checkNum),
     storedVersions: c.readOpt(obj["storedVersions"], x => c.readList(x, c.checkStr)),
   }}
 export function fromCustomResourceDefinitionStatus(input: CustomResourceDefinitionStatus): c.JSONValue {
@@ -476,6 +478,7 @@ export function fromCustomResourceDefinitionStatus(input: CustomResourceDefiniti
 export interface CustomResourceDefinitionCondition {
   lastTransitionTime?: c.Time | null;
   message?: string | null;
+  observedGeneration?: number | null;
   reason?: string | null;
   status: string;
   type: string;
@@ -485,6 +488,7 @@ export function toCustomResourceDefinitionCondition(input: c.JSONValue): CustomR
   return {
     lastTransitionTime: c.readOpt(obj["lastTransitionTime"], c.toTime),
     message: c.readOpt(obj["message"], c.checkStr),
+    observedGeneration: c.readOpt(obj["observedGeneration"], c.checkNum),
     reason: c.readOpt(obj["reason"], c.checkStr),
     status: c.checkStr(obj["status"]),
     type: c.checkStr(obj["type"]),
