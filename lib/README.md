@@ -44,7 +44,11 @@ for more information.
 
 ## Changelog
 
-* `v0.7.1` on `2026.02.16`:
+* `v0.7.2` on `2026.02.19`:
+  * New extra export `./core/v1/pod-health` for judging a Pod's health for a user.
+    * Contains a subset of printer logic ported from `kubectl get pods`.
+
+* `v0.7.1` on `2026.02.19`:
   * Includes 'builtin' APIs generated from K8s `v1.35.1`.
     * New APIs:
       * `scheduling.k8s.io/v1alpha1` with kind `Workload`

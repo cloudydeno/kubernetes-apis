@@ -1,6 +1,6 @@
 {
   "name": "@cloudydeno/kubernetes-apis",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "imports": {
     "@cloudydeno/kubernetes-client": "jsr:@cloudydeno/kubernetes-client@^0.8"
   },
