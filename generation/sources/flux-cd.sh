@@ -25,7 +25,7 @@ deno run \
   --allow-write="lib/$projectname" \
   generation/run-on-crds.ts \
   "$specdir" \
-  "$projectname"
+  "lib/$projectname"
 
 deno check "lib/$projectname"/*/mod.ts
 git status "lib/$projectname"

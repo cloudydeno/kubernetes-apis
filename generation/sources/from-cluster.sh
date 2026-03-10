@@ -9,7 +9,7 @@ deno run \
   --allow-write="lib/builtin" \
   generation/mod.ts \
   "generation/api-specs/from-cluster.json" \
-  "builtin"
+  "lib/builtin"
 
 # deno check lib/builtin/*/structs.ts
 

@@ -15,7 +15,7 @@ deno run \
   --allow-write="lib/builtin" \
   generation/mod.ts \
   "generation/api-specs/builtin-$1.json" \
-  "builtin"
+  "lib/builtin"
 
 deno check lib/builtin/*/structs.ts
 

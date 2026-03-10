@@ -3,8 +3,8 @@ import { generateModuleTypescript } from "./codegen-mod.ts";
 import { generateStructsTypescript } from "./codegen-structs.ts";
 import { SurfaceApi, SurfaceMap } from "./describe-surface.ts";
 
-export async function writeApiModule(surface: SurfaceMap, api: SurfaceApi, category: string, apisModuleRoot?: string) {
-  const modRoot = joinPath('lib', category, api.moduleName);
+export async function writeApiModule(surface: SurfaceMap, api: SurfaceApi, baseDir: string, apisModuleRoot?: string) {
+  const modRoot = joinPath(baseDir, api.moduleName);
 
   function postProcess(text: string) {
     if (apisModuleRoot) {

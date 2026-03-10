@@ -22,7 +22,7 @@ deno run \
   --allow-write="lib/$projectname" \
   generation/run-on-crds.ts \
   "$specdir" \
-  "$projectname"
+  "lib/$projectname"
 
 # Let's not hang on to previous versions
 rm -r "lib/$projectname"/*@v1beta2
