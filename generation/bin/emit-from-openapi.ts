@@ -1,6 +1,6 @@
-import type { OpenAPI2 } from './openapi.ts';
-import { writeApiModule } from "./codegen.ts";
-import { describeSurface } from "./describe-surface.ts";
+import type { OpenAPI2 } from '../openapi.ts';
+import { writeApiModule } from "../codegen.ts";
+import { describeSurface } from "../describe-surface.ts";
 
 const data = await Deno.readTextFile(Deno.args[0] ?? 'openapi.json');
 const wholeSpec: OpenAPI2 = JSON.parse(data);

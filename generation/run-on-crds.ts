@@ -1,91 +1,99 @@
-import { parseAll as parseAllYAML } from "@std/yaml/parse";
-import type { ApiKind, JSONValue } from "@cloudydeno/kubernetes-client/lib/contract.ts";
-
 import type { OpenAPI2SchemaObject, OpenAPI2Methods, OpenAPI2PathMethod } from './openapi.ts';
 import { writeApiModule } from "./codegen.ts";
 import { SurfaceMap, SurfaceApi, OpScope } from "./describe-surface.ts";
 import { ShapeLibrary } from "./describe-shapes.ts";
-import { knownOptsForward } from "./known-opts.ts";
+import { knownOptsForward as knownOpts } from "./known-opts.ts";
 
 import {
   CustomResourceDefinition as CRDv1,
-  toCustomResourceDefinition as toCRDv1,
   CustomResourceSubresources,
   CustomResourceDefinitionNames,
-} from "../lib/builtin/apiextensions.k8s.io@v1/structs.ts";
+} from "@cloudydeno/kubernetes-apis/apiextensions.k8s.io/v1";
 
-const v1CRDs = new Array<CRDv1>();
+export async function runOnCrds(v1CRDs: Array<CRDv1>, baseDir: string, apisModuleRoot?: string) {
+  // Sort CRDs by name, to ensure we use a stable order
+  v1CRDs = v1CRDs.toSorted((a,b) => a.metadata!.name!.localeCompare(b.metadata!.name!));
+  if (v1CRDs.length == 0) {
+    throw new Error(`No CRDs found! Whoops?`);
+  }
 
-const knownOpts = knownOptsForward;
+  const apiMap = new SurfaceMap({
+    paths: {},
+    definitions: {},
+    swagger: 'faked'
+  });
+  apiMap.allApis[0].moduleName = `../builtin/meta@v1`;
 
-for await (const dirEntry of Deno.readDir(Deno.args[0])) {
-  if (!dirEntry.isFile) continue;
-  if (!dirEntry.name.endsWith('.yaml')) continue;
-  if (dirEntry.name.endsWith('.example.yaml')) continue;
+  apiMap.registerApi({
+    apiRoot: '/api/v1/',
+    shapePrefix: 'io.k8s.api.core.v1.',
 
-  const raw = await Deno.readFile(Deno.args[0]+'/'+dirEntry.name);
-  const docs = parseAllYAML(new TextDecoder('utf-8').decode(raw)) as Array<unknown>;
-  for (const doc of docs) {
+    apiGroup: 'core',
+    apiVersion: 'v1',
+    apiGroupVersion: 'v1',
+    friendlyName: 'CoreV1',
+    moduleName: `../builtin/core@v1`,
 
-    const typing = doc as ApiKind;
-    if (typing.kind !== "CustomResourceDefinition") throw new Error(
-      `I didn't see a CRD in ${dirEntry.name}`);
-    switch (typing.apiVersion) {
-      case 'apiextensions.k8s.io/v1':
-        v1CRDs.push(toCRDv1(doc as JSONValue));
-        break;
-      default: throw new Error(
-        `The CRD in ${dirEntry.name} uses an unsupported apiVersion ${JSON.stringify(typing.apiVersion)}`);
+    operations: [],
+    definitions: new Map,
+    kinds: new Map(),
+    shapes: new ShapeLibrary('io.k8s.api.core.v1.', apiMap.byDefPrefix),
+  });
+
+  // used for /scale subresources
+  apiMap.registerApi({
+    apiRoot: '/apis/autoscaling/v1',
+    shapePrefix: 'io.k8s.api.autoscaling.v1.',
+
+    apiGroup: 'autoscaling',
+    apiVersion: 'v1',
+    apiGroupVersion: 'autoscaling/v1',
+    friendlyName: 'AutoscalingV1',
+    moduleName: `../builtin/autoscaling@v1`,
+
+    operations: [],
+    definitions: new Map,
+    kinds: new Map(),
+    shapes: new ShapeLibrary('io.k8s.api.autoscaling.v1.', apiMap.byDefPrefix),
+  });
+
+  for (const crd of v1CRDs) {
+    for (const version of crd.spec.versions ?? []) {
+
+      const schema = version.schema?.openAPIV3Schema;
+      if (!schema) throw new Error(
+        `TODO: No schema given for ${crd.spec.names.kind}`);
+
+      processCRD(apiMap, {
+        apiGroup: crd.spec.group,
+        apiVersion: version.name,
+        schema: schema as OpenAPI2SchemaObject,
+        names: crd.spec.names,
+        scope: crd.spec.scope,
+        subResources: {...version.subresources},
+      });
     }
   }
+
+  for (const [api, defs] of apis.values()) {
+    api.shapes.loadShapes(defs);
+  }
+
+  for (const api of apiMap.allApis) {
+    if (api.moduleName.startsWith('../')) continue;
+    try {
+      await writeApiModule(apiMap, api, baseDir, apisModuleRoot);
+    } catch (err) {
+      console.error(`Error writing`, api.apiGroupVersion);
+      console.error(err);
+    }
+  }
+
 }
-
-// Sort CRDs by name, to ensure we use a stable order
-v1CRDs.sort((a,b) => a.metadata!.name!.localeCompare(b.metadata!.name!));
-
-const apiMap = new SurfaceMap({
-  paths: {},
-  definitions: {},
-  swagger: 'faked'
-});
-apiMap.allApis[0].moduleName = `../builtin/meta@v1`;
-
-apiMap.registerApi({
-  apiRoot: '/api/v1/',
-  shapePrefix: 'io.k8s.api.core.v1.',
-
-  apiGroup: 'core',
-  apiVersion: 'v1',
-  apiGroupVersion: 'v1',
-  friendlyName: 'CoreV1',
-  moduleName: `../builtin/core@v1`,
-
-  operations: new Array,
-  definitions: new Map,
-  kinds: new Map(),
-  shapes: new ShapeLibrary('io.k8s.api.core.v1.', apiMap.byDefPrefix),
-});
-
-// used for /scale subresources
-apiMap.registerApi({
-  apiRoot: '/apis/autoscaling/v1',
-  shapePrefix: 'io.k8s.api.autoscaling.v1.',
-
-  apiGroup: 'autoscaling',
-  apiVersion: 'v1',
-  apiGroupVersion: 'autoscaling/v1',
-  friendlyName: 'AutoscalingV1',
-  moduleName: `../builtin/autoscaling@v1`,
-
-  operations: new Array,
-  definitions: new Map,
-  kinds: new Map(),
-  shapes: new ShapeLibrary('io.k8s.api.autoscaling.v1.', apiMap.byDefPrefix),
-});
 
 type DefMap = Map<string, OpenAPI2SchemaObject>;
 const apis = new Map<string, [SurfaceApi, DefMap]>();
-function recognizeGroupVersion(apiGroup: string, apiVersion: string) {
+function recognizeGroupVersion(apiGroup: string, apiVersion: string, apiMap: SurfaceMap) {
   const key = JSON.stringify([apiGroup, apiVersion]);
   const existing = apis.get(key);
   if (existing) return existing;
@@ -106,7 +114,7 @@ function recognizeGroupVersion(apiGroup: string, apiVersion: string) {
     friendlyName: groupName + versionName,
     moduleName: `${apiGroup}@${apiVersion}`,
     shapePrefix: shapePrefix,
-    operations: new Array,
+    operations: [],
     definitions: new Map,
     kinds: new Map,
     shapes: new ShapeLibrary(shapePrefix, apiMap.byDefPrefix),
@@ -117,45 +125,7 @@ function recognizeGroupVersion(apiGroup: string, apiVersion: string) {
   return [api, map] as const;
 }
 
-if (v1CRDs.length > 0) {
-
-  for (const crd of v1CRDs) {
-    for (const version of crd.spec.versions ?? []) {
-
-      const schema = version.schema?.openAPIV3Schema;
-      if (!schema) throw new Error(
-        `TODO: No schema given for ${crd.spec.names.kind}`);
-
-      processCRD({
-        apiGroup: crd.spec.group,
-        apiVersion: version.name,
-        schema: schema as OpenAPI2SchemaObject,
-        names: crd.spec.names,
-        scope: crd.spec.scope,
-        subResources: {...version.subresources},
-      });
-    }
-  }
-
-} else {
-  throw new Error(`No CRDs found! Whoops?`);
-}
-
-for (const [api, defs] of apis.values()) {
-  api.shapes.loadShapes(defs);
-}
-
-for (const api of apiMap.allApis) {
-  if (api.moduleName.startsWith('../')) continue;
-  try {
-    await writeApiModule(apiMap, api, Deno.args[1], Deno.args[2]);
-  } catch (err) {
-    console.error(`Error writing`, api.apiGroupVersion);
-    console.error(err);
-  }
-}
-
-function processCRD({apiGroup, apiVersion, schema, names, scope, subResources}: {
+function processCRD(apiMap: SurfaceMap, {apiGroup, apiVersion, schema, names, scope, subResources}: {
   apiGroup: string,
   apiVersion: string,
   schema: OpenAPI2SchemaObject,
@@ -164,7 +134,7 @@ function processCRD({apiGroup, apiVersion, schema, names, scope, subResources}: 
   subResources: CustomResourceSubresources,
 }) {
 
-  const [api, defs] = recognizeGroupVersion(apiGroup, apiVersion);
+  const [api, defs] = recognizeGroupVersion(apiGroup, apiVersion, apiMap);
 
   // operations: Array<SurfaceOperation>,
   // definitions: Map<string,OpenAPI2SchemaObject>,
