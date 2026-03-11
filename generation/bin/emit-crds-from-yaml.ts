@@ -1,7 +1,7 @@
 import { parseAll as parseAllYAML } from "@std/yaml/parse";
 import type { ApiKind, JSONValue } from "@cloudydeno/kubernetes-client/lib/contract.ts";
 import {
-  CustomResourceDefinition as CRDv1,
+  type CustomResourceDefinition as CRDv1,
   toCustomResourceDefinition as toCRDv1,
 } from "@cloudydeno/kubernetes-apis/apiextensions.k8s.io/v1";
 
