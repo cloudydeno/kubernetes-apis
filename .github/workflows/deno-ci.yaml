@@ -61,7 +61,7 @@ jobs:
 
   check-publish:
     runs-on: ubuntu-latest
-    name: Audit ./lib
+    name: Audit publishables
 
     steps:
     - name: Checkout source
@@ -81,7 +81,7 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    name: Publish ./lib
+    name: Publish publishables
     needs:
     - check
     - check-publish
