@@ -20,9 +20,9 @@ rm -r "lib/$projectname"/* \
 deno run \
   --allow-read="generation/api-specs" \
   --allow-write="lib/$projectname" \
-  generation/run-on-crds.ts \
+  generation/cmd/emit-crds-from-yaml.ts \
   "$specdir" \
-  "$projectname"
+  "lib/$projectname"
 
 # Let's not hang on to previous versions
 rm -r "lib/$projectname"/*@v1beta2

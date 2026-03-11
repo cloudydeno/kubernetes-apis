@@ -7,9 +7,9 @@ kubectl get --raw /openapi/v2 \
 deno run \
   --allow-read="generation/api-specs" \
   --allow-write="lib/builtin" \
-  generation/mod.ts \
+  generation/cmd/emit-from-openapi.ts \
   "generation/api-specs/from-cluster.json" \
-  "builtin"
+  "lib/builtin"
 
 # deno check lib/builtin/*/structs.ts
 

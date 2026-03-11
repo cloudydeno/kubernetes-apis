@@ -13,9 +13,9 @@ rm -r lib/builtin/* \
 deno run \
   --allow-read="generation/api-specs" \
   --allow-write="lib/builtin" \
-  generation/mod.ts \
+  generation/cmd/emit-from-openapi.ts \
   "generation/api-specs/builtin-$1.json" \
-  "builtin"
+  "lib/builtin"
 
 deno check lib/builtin/*/structs.ts
 

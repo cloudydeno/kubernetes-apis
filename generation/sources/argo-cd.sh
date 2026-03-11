@@ -22,9 +22,9 @@ rm -r "lib/$projectname"/* \
 deno run \
   --allow-read="generation/api-specs" \
   --allow-write="lib/$projectname" \
-  generation/run-on-crds.ts \
+  generation/cmd/emit-crds-from-yaml.ts \
   "$specdir" \
-  "$projectname"
+  "lib/$projectname"
 
 deno check "lib/$projectname"/*/mod.ts
 git status "lib/$projectname"

@@ -1,4 +1,13 @@
 {
+  "name": "@cloudydeno/kubernetes-codegen",
+  "version": "0.1.0",
+  "license": "Apache 2",
+  "exports": {
+    "./cmd/emit-crds-from-cluster": "./cmd/emit-crds-from-cluster.ts",
+    "./cmd/emit-crds-from-yaml": "./cmd/emit-crds-from-yaml.ts",
+    "./cmd/emit-from-cluster": "./cmd/emit-from-cluster.ts",
+    "./cmd/emit-from-openapi": "./cmd/emit-from-openapi.ts"
+  },
   "imports": {
     "@cloudydeno/kubernetes-client": "jsr:@cloudydeno/kubernetes-client@^0.8",
     "@std/path": "jsr:@std/path@^1",

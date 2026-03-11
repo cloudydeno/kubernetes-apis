@@ -1,5 +1,5 @@
-import { ApiShape, ForeignShape, SpecialShape, StructureShape } from "./describe-shapes.ts";
-import { SurfaceMap, SurfaceApi } from "./describe-surface.ts";
+import type { ApiShape, ForeignShape, SpecialShape, StructureShape } from "./surface-shapes.ts";
+import type { SurfaceMap, SurfaceApi } from "./surface.ts";
 
 type ExtraStructsList = Array<{name: string, struct: StructureShape}>;
 
@@ -125,7 +125,7 @@ export function generateStructsTypescript(surface: SurfaceMap, apiS: SurfaceApi)
     }
     switch (shape.type) {
 
-      case 'structure':
+      case 'structure': {
 
         const isKind = shape.kind
           && apiS.kinds.has(shape.kind.kind);
@@ -257,6 +257,7 @@ export function generateStructsTypescript(surface: SurfaceMap, apiS: SurfaceApi)
         }
 
         break;
+      };
 
       case 'string':
         chunks.push(`export type ${name} = ${generateType(shape)};`);

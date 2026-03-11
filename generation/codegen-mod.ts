@@ -1,7 +1,7 @@
-import { SurfaceMap, SurfaceApi, SurfaceOperation } from "./describe-surface.ts";
-import { OpenAPI2RequestParameter } from "./openapi.ts";
-import { ApiShape } from "./describe-shapes.ts";
-import { knownOptsReverse } from "./known-opts.ts";
+import type { SurfaceMap, SurfaceApi, SurfaceOperation } from "./surface.ts";
+import type { OpenAPI2RequestParameter } from "./util/openapi.ts";
+import type { ApiShape } from "./surface-shapes.ts";
+import { knownOptsReverse } from "./util/known-opts.ts";
 
 const knownOpts = knownOptsReverse;
 

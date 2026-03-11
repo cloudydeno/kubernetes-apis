@@ -1,6 +1,6 @@
-import type { OpenAPI2 } from './openapi.ts';
-import { writeApiModule } from "./codegen.ts";
-import { describeSurface } from "./describe-surface.ts";
+import type { OpenAPI2 } from '../util/openapi.ts';
+import { emitSurfaceApis } from "../emit.ts";
+import { describeOpenapiSurface } from "../surface-from-openapi.ts";
 
 const data = await Deno.readTextFile(Deno.args[0] ?? 'openapi.json');
 const wholeSpec: OpenAPI2 = JSON.parse(data);
@@ -16,13 +16,5 @@ for (const value of Object.values(wholeSpec.paths)) {
   }
 }
 
-const surface = describeSurface(wholeSpec);
-
-for (const api of surface.allApis) {
-  try {
-    await writeApiModule(surface, api, Deno.args[1] ?? 'builtin');
-  } catch (err) {
-    console.error(`Error writing`, api.apiGroupVersion);
-    console.error(err);
-  }
-}
+const surface = describeOpenapiSurface(wholeSpec);
+await emitSurfaceApis(surface, Deno.args[1] ?? 'lib/builtin');

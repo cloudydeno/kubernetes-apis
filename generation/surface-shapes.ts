@@ -1,5 +1,5 @@
-import { OpenAPI2SchemaObject, GroupVersionKind } from "./openapi.ts";
-import { SurfaceApi } from "./describe-surface.ts";
+import type { OpenAPI2SchemaObject, GroupVersionKind } from "./util/openapi.ts";
+import type { SurfaceApi } from "./surface.ts";
 
 export class ShapeLibrary {
   localApi: string;
@@ -99,16 +99,10 @@ export class ShapeLibrary {
         };
       }
 
-      let enumVals = schema.enum;
-      // const enumHeuristic = schema.description?.match(/(?:One of|Valid values are) ((?:["']?[^\. ,]+["']?(?:,|, and|\.) ?)+)/);
-      // if (enumHeuristic && enumHeuristic[1]) {
-      //   enumVals = enumHeuristic[1].split(',').map(x => x.replace(/['"]/g, ' ').trim());
-      // }
-
       return {
         type: 'string',
         format: schema.format ?? undefined,
-        enum: enumVals ?? undefined,
+        enum: schema.enum ?? undefined,
         description: schema.description ?? undefined,
       };
 
