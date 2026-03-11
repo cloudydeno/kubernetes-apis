@@ -5,7 +5,8 @@ import {
   toCustomResourceDefinition as toCRDv1,
 } from "@cloudydeno/kubernetes-apis/apiextensions.k8s.io/v1";
 
-import { runOnCrds } from "../run-on-crds.ts";
+import { describeCrdsSurface } from "../surface-from-crds.ts";
+import { emitSurfaceApis } from "../emit.ts";
 
 const v1CRDs = new Array<CRDv1>();
 
@@ -31,4 +32,9 @@ for await (const dirEntry of Deno.readDir(Deno.args[0])) {
   }
 }
 
-await runOnCrds(v1CRDs, Deno.args[1] ?? 'lib', Deno.args[2]);
+if (!v1CRDs.length) {
+  throw new Error(`No CRDs found! Whoops?`);
+}
+
+const surface = describeCrdsSurface(v1CRDs);
+await emitSurfaceApis(surface, Deno.args[1] ?? 'lib', Deno.args[2]);

@@ -1,7 +1,9 @@
 #!/usr/bin/env -S deno run --allow-env --allow-read --allow-net --allow-write=.
 import { autoDetectClient } from '@cloudydeno/kubernetes-client';
 import { ApiextensionsV1Api } from "@cloudydeno/kubernetes-apis/apiextensions.k8s.io/v1";
-import { runOnCrds } from "../run-on-crds.ts";
+
+import { describeCrdsSurface } from "../surface-from-crds.ts";
+import { emitSurfaceApis } from "../emit.ts";
 
 const kubernetes = await autoDetectClient();
 const apiextensionsApi = new ApiextensionsV1Api(kubernetes);
@@ -20,4 +22,5 @@ if (!v1CRDs.length) {
   Deno.exit(5);
 }
 
-await runOnCrds(v1CRDs, Deno.args[1] ?? 'lib', Deno.args[2]);
+const surface = describeCrdsSurface(v1CRDs);
+await emitSurfaceApis(surface, Deno.args[1] ?? 'lib', Deno.args[2]);

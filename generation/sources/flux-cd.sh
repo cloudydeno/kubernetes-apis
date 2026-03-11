@@ -23,7 +23,7 @@ rm -r "lib/$projectname"/* \
 deno run \
   --allow-read="generation/api-specs" \
   --allow-write="lib/$projectname" \
-  generation/bin/emit-crds-from-yaml.ts \
+  generation/cmd/emit-crds-from-yaml.ts \
   "$specdir" \
   "lib/$projectname"
 

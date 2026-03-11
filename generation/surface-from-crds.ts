@@ -1,21 +1,17 @@
-import type { OpenAPI2SchemaObject, OpenAPI2Methods, OpenAPI2PathMethod } from './openapi.ts';
-import { writeApiModule } from "./codegen.ts";
-import { SurfaceMap, SurfaceApi, OpScope } from "./describe-surface.ts";
-import { ShapeLibrary } from "./describe-shapes.ts";
-import { knownOptsForward as knownOpts } from "./known-opts.ts";
-
-import {
+import type {
   CustomResourceDefinition as CRDv1,
   CustomResourceSubresources,
   CustomResourceDefinitionNames,
 } from "@cloudydeno/kubernetes-apis/apiextensions.k8s.io/v1";
 
-export async function runOnCrds(v1CRDs: Array<CRDv1>, baseDir: string, apisModuleRoot?: string) {
+import type { OpenAPI2SchemaObject, OpenAPI2Methods, OpenAPI2PathMethod } from './util/openapi.ts';
+import { SurfaceMap, type SurfaceApi, type OpScope } from "./surface.ts";
+import { ShapeLibrary } from "./describe-shapes.ts";
+import { knownOptsForward as knownOpts } from "./util/known-opts.ts";
+
+export function describeCrdsSurface(v1CRDs: Array<CRDv1>) {
   // Sort CRDs by name, to ensure we use a stable order
   v1CRDs = v1CRDs.toSorted((a,b) => a.metadata!.name!.localeCompare(b.metadata!.name!));
-  if (v1CRDs.length == 0) {
-    throw new Error(`No CRDs found! Whoops?`);
-  }
 
   const apiMap = new SurfaceMap({
     paths: {},
@@ -75,24 +71,15 @@ export async function runOnCrds(v1CRDs: Array<CRDv1>, baseDir: string, apisModul
     }
   }
 
-  for (const [api, defs] of apis.values()) {
+  for (const {api, defs} of apis.values()) {
     api.shapes.loadShapes(defs);
   }
 
-  for (const api of apiMap.allApis) {
-    if (api.moduleName.startsWith('../')) continue;
-    try {
-      await writeApiModule(apiMap, api, baseDir, apisModuleRoot);
-    } catch (err) {
-      console.error(`Error writing`, api.apiGroupVersion);
-      console.error(err);
-    }
-  }
-
+  return apiMap;
 }
 
 type DefMap = Map<string, OpenAPI2SchemaObject>;
-const apis = new Map<string, [SurfaceApi, DefMap]>();
+const apis = new Map<string, {api: SurfaceApi, defs: DefMap}>();
 function recognizeGroupVersion(apiGroup: string, apiVersion: string, apiMap: SurfaceMap) {
   const key = JSON.stringify([apiGroup, apiVersion]);
   const existing = apis.get(key);
@@ -120,9 +107,9 @@ function recognizeGroupVersion(apiGroup: string, apiVersion: string, apiMap: Sur
     shapes: new ShapeLibrary(shapePrefix, apiMap.byDefPrefix),
   });
 
-  const map: DefMap = new Map();
-  apis.set(key, [api, map]);
-  return [api, map] as const;
+  const defs: DefMap = new Map();
+  apis.set(key, { api, defs });
+  return { api, defs };
 }
 
 function processCRD(apiMap: SurfaceMap, {apiGroup, apiVersion, schema, names, scope, subResources}: {
@@ -134,7 +121,7 @@ function processCRD(apiMap: SurfaceMap, {apiGroup, apiVersion, schema, names, sc
   subResources: CustomResourceSubresources,
 }) {
 
-  const [api, defs] = recognizeGroupVersion(apiGroup, apiVersion, apiMap);
+  const { api, defs } = recognizeGroupVersion(apiGroup, apiVersion, apiMap);
 
   // operations: Array<SurfaceOperation>,
   // definitions: Map<string,OpenAPI2SchemaObject>,

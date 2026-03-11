@@ -13,7 +13,7 @@ rm -r lib/builtin/* \
 deno run \
   --allow-read="generation/api-specs" \
   --allow-write="lib/builtin" \
-  generation/bin/emit-from-openapi.ts \
+  generation/cmd/emit-from-openapi.ts \
   "generation/api-specs/builtin-$1.json" \
   "lib/builtin"
 

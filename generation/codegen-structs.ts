@@ -1,5 +1,5 @@
 import { ApiShape, ForeignShape, SpecialShape, StructureShape } from "./describe-shapes.ts";
-import { SurfaceMap, SurfaceApi } from "./describe-surface.ts";
+import { SurfaceMap, SurfaceApi } from "./surface.ts";
 
 type ExtraStructsList = Array<{name: string, struct: StructureShape}>;
 

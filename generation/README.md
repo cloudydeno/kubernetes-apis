@@ -5,7 +5,8 @@ If you are not looking to interact with Kubernetes CRDs, you probably don't need
 
 ## Entrypoints
 
-* `@cloudydeno/kubernetes-codegen/cmd/emit-crds-from-cluster`
+* `./cmd/emit-crds-from-cluster` writes an API client for the CRDs from your live cluster which belong to a particular group.
+  * `deno run  --allow-env --allow-read --allow-net --allow-write=. @cloudydeno/kubernetes-codegen/cmd/emit-crds-from-cluster helm.toolkit.fluxcd.io`
 
 ## Kubernetes compatability
 

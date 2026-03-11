@@ -1,11 +1,11 @@
 #!/usr/bin/env -S deno run --allow-env --allow-read --allow-net --allow-write=.
 import { autoDetectClient } from '@cloudydeno/kubernetes-client';
+
+import type { OpenAPI2 } from '../util/openapi.ts';
+import { describeOpenapiSurface } from "../surface-from-openapi.ts";
+import { emitSurfaceApis } from "../emit.ts";
+
 const kubernetes = await autoDetectClient();
-
-import type { OpenAPI2 } from '../openapi.ts';
-import { writeApiModule } from "../codegen.ts";
-import { describeSurface } from "../describe-surface.ts";
-
 const wholeSpec = await kubernetes.performRequest({
   method: 'GET',
   path: '/openapi/v2',
@@ -23,13 +23,5 @@ for (const value of Object.values(wholeSpec.paths)) {
   }
 }
 
-const surface = describeSurface(wholeSpec);
-
-for (const api of surface.allApis) {
-  try {
-    await writeApiModule(surface, api, Deno.args[1] ?? 'lib/from-cluster');
-  } catch (err) {
-    console.error(`Error writing`, api.apiGroupVersion);
-    console.error(err);
-  }
-}
+const surface = describeOpenapiSurface(wholeSpec);
+await emitSurfaceApis(surface, Deno.args[1] ?? 'lib/from-cluster');
