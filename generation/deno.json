@@ -2,10 +2,10 @@
   "name": "@cloudydeno/kubernetes-codegen",
   "version": "0.1.0",
   "exports": {
-    "./emit-crds-from-cluster": "./bin/emit-crds-from-cluster.ts",
-    "./emit-crds-from-yaml": "./bin/emit-crds-from-yaml.ts",
-    "./emit-from-cluster": "./bin/emit-from-cluster.ts",
-    "./emit-from-openapi": "./bin/emit-from-openapi.ts"
+    "./cmd/emit-crds-from-cluster": "./cmd/emit-crds-from-cluster.ts",
+    "./cmd/emit-crds-from-yaml": "./cmd/emit-crds-from-yaml.ts",
+    "./cmd/emit-from-cluster": "./cmd/emit-from-cluster.ts",
+    "./cmd/emit-from-openapi": "./cmd/emit-from-openapi.ts"
   },
   "imports": {
     "@cloudydeno/kubernetes-client": "jsr:@cloudydeno/kubernetes-client@^0.8",
