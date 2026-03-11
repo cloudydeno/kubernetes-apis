@@ -21,6 +21,8 @@ jobs:
         - v2.3
         - v2.4
         - v2.5
+        - v2.6
+        - v2.7
         - canary
       fail-fast: false # run each branch to completion
 
@@ -42,8 +44,8 @@ jobs:
     - name: Possibly reset lockfile
       run: deno install || rm deno.lock
 
-    - name: Check generation/mod.ts
-      run: time deno check generation/mod.ts
+    - name: Check generation/cmd/*.ts
+      run: time deno check generation/cmd/*.ts
 
     - name: Check lib/builtin/*/mod.ts
       run: time deno check lib/builtin/*/mod.ts
@@ -57,7 +59,7 @@ jobs:
     - name: Test
       run: time deno test
 
-  check-publish-lib:
+  check-publish:
     runs-on: ubuntu-latest
     name: Audit ./lib
 
@@ -75,15 +77,14 @@ jobs:
         key: denodir-${{ hashFiles('deno.lock') }}
 
     - name: Check publish rules
-      working-directory: lib
       run: deno publish --dry-run --allow-dirty
 
-  publish-lib:
+  publish:
     runs-on: ubuntu-latest
     name: Publish ./lib
     needs:
     - check
-    - check-publish-lib
+    - check-publish
     if: github.event_name == 'push'
 
     permissions:

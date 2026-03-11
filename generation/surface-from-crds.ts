@@ -6,7 +6,7 @@ import type {
 
 import type { OpenAPI2SchemaObject, OpenAPI2Methods, OpenAPI2PathMethod } from './util/openapi.ts';
 import { SurfaceMap, type SurfaceApi, type OpScope } from "./surface.ts";
-import { ShapeLibrary } from "./describe-shapes.ts";
+import { ShapeLibrary } from "./surface-shapes.ts";
 import { knownOptsForward as knownOpts } from "./util/known-opts.ts";
 
 export function describeCrdsSurface(v1CRDs: Array<CRDv1>) {

@@ -3,7 +3,19 @@ import { generateModuleTypescript } from "./codegen-mod.ts";
 import { generateStructsTypescript } from "./codegen-structs.ts";
 import type { SurfaceApi, SurfaceMap } from "./surface.ts";
 
-export async function writeApiModule(surface: SurfaceMap, api: SurfaceApi, baseDir: string, apisModuleRoot?: string) {
+export async function emitSurfaceApis(surface: SurfaceMap, baseDir: string, apisModuleRoot?: string): Promise<void> {
+  for (const api of surface.allApis) {
+    if (api.moduleName.startsWith('../')) continue;
+    try {
+      await emitApiModule(surface, api, baseDir, apisModuleRoot);
+    } catch (err) {
+      console.error(`Error writing`, api.apiGroupVersion);
+      console.error(err);
+    }
+  }
+}
+
+async function emitApiModule(surface: SurfaceMap, api: SurfaceApi, baseDir: string, apisModuleRoot?: string): Promise<void> {
   const modRoot = joinPath(baseDir, api.moduleName);
 
   function postProcess(text: string) {
@@ -30,17 +42,5 @@ export async function writeApiModule(surface: SurfaceMap, api: SurfaceApi, baseD
     await Deno.writeTextFile(joinPath(modRoot, 'mod.ts'),
       postProcess(generateModuleTypescript(surface, api)));
     console.log('Wrote', joinPath(modRoot, 'mod.ts'));
-  }
-}
-
-export async function emitSurfaceApis(surface: SurfaceMap, baseDir: string, apisModuleRoot?: string): Promise<void> {
-  for (const api of surface.allApis) {
-    if (api.moduleName.startsWith('../')) continue;
-    try {
-      await writeApiModule(surface, api, baseDir, apisModuleRoot);
-    } catch (err) {
-      console.error(`Error writing`, api.apiGroupVersion);
-      console.error(err);
-    }
   }
 }

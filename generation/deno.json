@@ -1,6 +1,7 @@
 {
   "name": "@cloudydeno/kubernetes-codegen",
   "version": "0.1.0",
+  "license": "Apache 2",
   "exports": {
     "./cmd/emit-crds-from-cluster": "./cmd/emit-crds-from-cluster.ts",
     "./cmd/emit-crds-from-yaml": "./cmd/emit-crds-from-yaml.ts",

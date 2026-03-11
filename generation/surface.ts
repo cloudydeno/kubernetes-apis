@@ -3,7 +3,7 @@ import type {
   OpenAPI2, OpenAPI2SchemaObject,
   OpenAPI2PathMethod, OpenAPI2RequestParameter,
 } from './util/openapi.ts';
-import { ShapeLibrary } from "./describe-shapes.ts";
+import { ShapeLibrary } from "./surface-shapes.ts";
 
 export class SurfaceMap {
   wholeSpec: OpenAPI2;
