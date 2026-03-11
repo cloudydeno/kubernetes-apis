@@ -17,4 +17,7 @@ for (const value of Object.values(wholeSpec.paths)) {
 }
 
 const surface = describeOpenapiSurface(wholeSpec);
-await emitSurfaceApis(surface, Deno.args[1] ?? 'lib/builtin');
+
+await emitSurfaceApis(surface,
+  Deno.args[1] ?? 'lib',
+  Deno.args[2] ?? '@cloudydeno/kubernetes-apis/');

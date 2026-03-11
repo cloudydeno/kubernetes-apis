@@ -32,5 +32,5 @@ Rough example:
 ```sh
 deno run --allow-env --allow-read --allow-net --allow-write=. \
   jsr:@cloudydeno/kubernetes-codegen/cmd/emit-crds-from-cluster \
-  helm.toolkit.fluxcd.io lib/ @cloudydeno/kubernetes-apis
+  helm.toolkit.fluxcd.io lib/
 ```

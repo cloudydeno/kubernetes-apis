@@ -6,11 +6,12 @@ kubectl get --raw /openapi/v2 \
 
 deno run \
   --allow-read="generation/api-specs" \
-  --allow-write="lib/builtin" \
+  --allow-write="lib/from-cluster" \
   generation/cmd/emit-from-openapi.ts \
   "generation/api-specs/from-cluster.json" \
-  "lib/builtin"
+  "lib/from-cluster" \
+  "../../"
 
-# deno check lib/builtin/*/structs.ts
+# deno check lib/from-cluster/*/structs.ts
 
-git status lib/builtin
+git status lib/from-cluster

@@ -9,18 +9,30 @@ const kubernetes = await autoDetectClient();
 const apiextensionsApi = new ApiextensionsV1Api(kubernetes);
 const availableCRDs = await apiextensionsApi.getCustomResourceDefinitionList();
 
-const desiredGroup = Deno.args[0];
+const [desiredGroup, desiredVersion] = Deno.args[0]?.split('@') ?? [];
 const v1CRDs = availableCRDs.items.filter(crd => crd.spec.group == desiredGroup);
 
 if (!v1CRDs.length) {
   console.error('No CRDs found for group', JSON.stringify(desiredGroup));
-  console.error('Available groups in current cluster:');
-  const groupList = [...new Set(availableCRDs.items.map(x => x.spec.group))].toSorted();
+  console.error('Available CRD groups in current cluster:');
+  const groupList = [...new Set(
+    availableCRDs.items.flatMap(
+      x => x.spec.versions.map(
+        y => `${x.spec.group}@${y.name}`))
+  )].toSorted();
   for (const group of groupList) {
     console.error(`* ${group}`);
   }
   Deno.exit(5);
 }
 
-const surface = describeCrdsSurface(v1CRDs);
-await emitSurfaceApis(surface, Deno.args[1] ?? 'lib', Deno.args[2]);
+const surface = describeCrdsSurface(v1CRDs, {
+  filterVersions(_crd, version) {
+    if (!desiredVersion) return true;
+    return version.name == desiredVersion;
+  },
+});
+
+await emitSurfaceApis(surface,
+  Deno.args[1] ?? 'lib',
+  Deno.args[2] ?? '@cloudydeno/kubernetes-apis/');

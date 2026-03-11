@@ -37,4 +37,7 @@ if (!v1CRDs.length) {
 }
 
 const surface = describeCrdsSurface(v1CRDs);
-await emitSurfaceApis(surface, Deno.args[1] ?? 'lib', Deno.args[2]);
+
+await emitSurfaceApis(surface,
+  Deno.args[1] ?? 'lib',
+  Deno.args[2] ?? '@cloudydeno/kubernetes-apis/');

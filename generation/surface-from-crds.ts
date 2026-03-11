@@ -2,6 +2,7 @@ import type {
   CustomResourceDefinition as CRDv1,
   CustomResourceSubresources,
   CustomResourceDefinitionNames,
+  CustomResourceDefinitionVersion,
 } from "@cloudydeno/kubernetes-apis/apiextensions.k8s.io/v1";
 
 import type { OpenAPI2SchemaObject, OpenAPI2Methods, OpenAPI2PathMethod } from './util/openapi.ts';
@@ -9,7 +10,9 @@ import { SurfaceMap, type SurfaceApi, type OpScope } from "./surface.ts";
 import { ShapeLibrary } from "./surface-shapes.ts";
 import { knownOptsForward as knownOpts } from "./util/known-opts.ts";
 
-export function describeCrdsSurface(v1CRDs: Array<CRDv1>) {
+export function describeCrdsSurface(v1CRDs: Array<CRDv1>, opts: {
+  filterVersions?: (crd: CRDv1, version: CustomResourceDefinitionVersion) => boolean;
+} = {}) {
   // Sort CRDs by name, to ensure we use a stable order
   v1CRDs = v1CRDs.toSorted((a,b) => a.metadata!.name!.localeCompare(b.metadata!.name!));
 
@@ -55,6 +58,7 @@ export function describeCrdsSurface(v1CRDs: Array<CRDv1>) {
 
   for (const crd of v1CRDs) {
     for (const version of crd.spec.versions ?? []) {
+      if (opts.filterVersions && !opts.filterVersions(crd, version)) continue;
 
       const schema = version.schema?.openAPIV3Schema;
       if (!schema) throw new Error(

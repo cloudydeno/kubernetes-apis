@@ -25,7 +25,8 @@ deno run \
   --allow-write="lib/$projectname" \
   generation/cmd/emit-crds-from-yaml.ts \
   "$specdir" \
-  "lib/$projectname"
+  "lib/$projectname" \
+  "../../"
 
 deno check "lib/$projectname"/*/mod.ts
 git status "lib/$projectname"
