@@ -36,7 +36,7 @@ jobs:
         deno-version: ${{ matrix.deno-version }}
 
     - name: Cache Deno deps
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: ~/.cache/deno
         key: denodir/${{ matrix.deno-version }}-${{ hashFiles('deno.lock') }}
@@ -71,7 +71,7 @@ jobs:
       uses: denoland/setup-deno@v2
 
     - name: Cache Deno deps
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: ~/.cache/deno
         key: denodir-${{ hashFiles('deno.lock') }}
@@ -96,7 +96,7 @@ jobs:
     - uses: actions/checkout@v6
 
     - name: Cache Deno deps
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: ~/.cache/deno
         key: denodir-${{ hashFiles('deno.lock') }}
