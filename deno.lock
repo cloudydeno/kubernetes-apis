@@ -1,22 +1,24 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@cloudydeno/kubernetes-client@0.8": "0.8.0",
+    "jsr:@cloudydeno/kubernetes-client@~0.8.1": "0.8.1",
     "jsr:@cloudydeno/stream-observables@1": "1.4.1",
     "jsr:@std/assert@^1.0.18": "1.0.18",
-    "jsr:@std/internal@^1.0.10": "1.0.10",
     "jsr:@std/internal@^1.0.12": "1.0.12",
-    "jsr:@std/path@1": "1.1.2",
-    "jsr:@std/streams@1": "1.0.12",
-    "jsr:@std/yaml@1": "1.0.9"
+    "jsr:@std/internal@^1.0.14": "1.0.14",
+    "jsr:@std/path@1": "1.1.6",
+    "jsr:@std/streams@1": "1.1.1",
+    "jsr:@std/yaml@1": "1.1.2",
+    "npm:undici@7": "7.29.0"
   },
   "jsr": {
-    "@cloudydeno/kubernetes-client@0.8.0": {
-      "integrity": "08066abfc8f7bb17f6a81f727af1d609dc19a11b14a6c941a52bf11f7a6aea36",
+    "@cloudydeno/kubernetes-client@0.8.1": {
+      "integrity": "d7baa0166ee2c375c23d89e285831ca6569ea14a3cfb4434460c96e71b08d23e",
       "dependencies": [
         "jsr:@std/path",
         "jsr:@std/streams",
-        "jsr:@std/yaml"
+        "jsr:@std/yaml",
+        "npm:undici"
       ]
     },
     "@cloudydeno/stream-observables@1.4.1": {
@@ -28,23 +30,28 @@
         "jsr:@std/internal@^1.0.12"
       ]
     },
-    "@std/internal@1.0.10": {
-      "integrity": "e3be62ce42cab0e177c27698e5d9800122f67b766a0bea6ca4867886cbde8cf7"
-    },
     "@std/internal@1.0.12": {
       "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
     },
-    "@std/path@1.1.2": {
-      "integrity": "c0b13b97dfe06546d5e16bf3966b1cadf92e1cc83e56ba5476ad8b498d9e3038",
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
+    },
+    "@std/path@1.1.6": {
+      "integrity": "c68485c2a4dfbb5ae3cc74fae4e8c4e5d874cf8a8ed12927917235c758b46cbe",
       "dependencies": [
-        "jsr:@std/internal@^1.0.10"
+        "jsr:@std/internal@^1.0.14"
       ]
     },
-    "@std/streams@1.0.12": {
-      "integrity": "ae925fa1dc459b1abf5cbaa28cc5c7b0485853af3b2a384b0dc22d86e59dfbf4"
+    "@std/streams@1.1.1": {
+      "integrity": "92556d350e537e9dce527a6d08f6f15be3ff65e656079dea69d15252187c7613"
     },
-    "@std/yaml@1.0.9": {
-      "integrity": "6bad3dc766dd85b4b37eabcba81b6aa4eac7a392792ae29abcfb0f90602d55bb"
+    "@std/yaml@1.1.2": {
+      "integrity": "de612653c036749ba2044165e316f52412b0f0698afffb7ee80b5331d6d2abae"
+    }
+  },
+  "npm": {
+    "undici@7.29.0": {
+      "integrity": "sha512-IDxfleLmmbSskfWSUATiN1nfn2rDuvnMOqb5CWR92iIfojA0Ud+ulOAAEQ57LPr9rWmsreUyf5lwyao+7GNNVw=="
     }
   },
   "remote": {
@@ -54,14 +61,14 @@
     "members": {
       "generation": {
         "dependencies": [
-          "jsr:@cloudydeno/kubernetes-client@0.8",
+          "jsr:@cloudydeno/kubernetes-client@~0.8.1",
           "jsr:@std/path@1",
           "jsr:@std/yaml@1"
         ]
       },
       "lib": {
         "dependencies": [
-          "jsr:@cloudydeno/kubernetes-client@0.8"
+          "jsr:@cloudydeno/kubernetes-client@~0.8.1"
         ]
       },
       "tests": {
